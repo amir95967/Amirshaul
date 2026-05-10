@@ -134,7 +134,7 @@ export default function App() {
       </main>
 
       <footer style={styles.footer}>
-        © 2026 Amir Shaul // Dev & Infra Specialist
+        © 2026 Amir Shaul //
       </footer>
     </div>
   );
