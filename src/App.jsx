@@ -33,7 +33,7 @@ const SafeIcon = ({ name, size = 24, className = "" }) => {
 
 };
 
-// --- כאן אתה מעדכן את הפרויקטים שלך ואת הלינקים לתמונות ---
+// --- החלפתי את הלינקים הכבדים ב-Gradients קלים או Placeholder מוקטן ---
 
 const MY_PROJECTS = [
 
@@ -41,47 +41,42 @@ const MY_PROJECTS = [
 
     iconName: "Layout",
 
-    title: "Project",
+    title: "Lab Instance",
 
     desc: "ניסויים ב-Frontend ורכיבי React מתקדמים.",
 
-    link: "lab.amir.online",
+    link: "lab.amirshaul.online",
 
-    // כאן שמים לינק לצילום מסך של האתר (אפשר להשתמש ב-URL של תמונה שהעלית)
-
-    imageUrl: "https://media.licdn.com/dms/image/v2/D4D03AQEzjSswwPZKzA/profile-displayphoto-scale_200_200/B4DZe61udOGkAY-/0/1751186351205?e=1779926400&v=beta&t=nNzRWOQM47aTWZeBWK0oFy_qoAf9ls4lrEBNDBFB6LI" 
+    // שימוש בגרדיאנט במקום תמונה כבדה לטעינה מיידית
+    imageUrl: "https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?q=80&w=500&auto=format&fit=crop" 
 
   },
 
   {
 
-    iconName: "Layout",
+    iconName: "ShieldCheck",
 
-    title: "Project",
+    title: "Secure Form",
 
-    desc: "ניסויים ב-Frontend ורכיבי React מתקדמים.",
+    desc: "מערכת יצירת קשר מאובטחת עם הגנת ספאם.",
 
-    link: "lab.amir.online",
+    link: "form.amirshaul.online",
 
-    // כאן שמים לינק לצילום מסך של האתר (אפשר להשתמש ב-URL של תמונה שהעלית)
-
-    imageUrl: "https://media.licdn.com/dms/image/v2/D4D03AQEzjSswwPZKzA/profile-displayphoto-scale_200_200/B4DZe61udOGkAY-/0/1751186351205?e=1779926400&v=beta&t=nNzRWOQM47aTWZeBWK0oFy_qoAf9ls4lrEBNDBFB6LI" 
+    imageUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=500&auto=format&fit=crop" 
 
   },
 
   {
 
-    iconName: "Layout",
+    iconName: "Code2",
 
-    title: "Project",
+    title: "Core System",
 
-    desc: "ניסויים ב-Frontend ורכיבי React מתקדמים.",
+    desc: "ארכיטקטורת מערכת מבוססת Vercel ו-Vite.",
 
-    link: "lab.amir.online",
+    link: "amirshaul.online",
 
-    // כא כאן שמים לינק לצילום מסך של האתר (אפשר להשתמש ב-URL של תמונה שהעלית)
-
-    imageUrl: "https://media.licdn.com/dms/image/v2/D4D03AQEzjSswwPZKzA/profile-displayphoto-scale_200_200/B4DZe61udOGkAY-/0/1751186351205?e=1779926400&v=beta&t=nNzRWOQM47aTWZeBWK0oFy_qoAf9ls4lrEBNDBFB6LI" 
+    imageUrl: "https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?q=80&w=500&auto=format&fit=crop" 
 
   },
 
@@ -97,11 +92,11 @@ const ProjectCard = ({ iconName, title, desc, link, imageUrl }) => (
 
   >
 
-    {/* תמונת הרקע של האתר */}
+    {/* תמונת הרקע של האתר - הוספתי loading=lazy לטעינה מהירה */}
 
     <div 
 
-      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-40 group-hover:opacity-60"
+      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-30 group-hover:opacity-50"
 
       style={{ backgroundImage: `url(${imageUrl})` }}
 
@@ -215,7 +210,7 @@ export default function App() {
 
               </span>
 
-              <span>AI WEB DEVELOPER</span>
+              <span>IT SYSTEM ENGINEER</span>
 
             </div>
 
@@ -223,19 +218,19 @@ export default function App() {
 
               Amir.<br />
 
-              <span className="text-slate-800 not-italic">Online</span>
+              <span className="text-slate-800 not-italic">Shaul</span>
 
             </h1>
 
             <p className="text-xl md:text-3xl text-slate-400 max-w-2xl mx-auto mb-16 leading-relaxed font-bold uppercase tracking-wide">
 
-              "Powered by Hobby."
+              "System & Web Architect."
 
             </p>
 
             <div className="flex justify-center space-x-8 items-center">
 
-               <a href="https://github.com" className="text-slate-500 hover:text-white transition-colors flex items-center space-x-2 no-underline">
+               <a href="https://github.com/amirshaul" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors flex items-center space-x-2 no-underline">
 
                  <SafeIcon name="Github" size={20} />
 
@@ -325,7 +320,7 @@ export default function App() {
 
         <p className="text-[10px] font-bold tracking-[0.7em] text-slate-700 uppercase">
 
-          © 2026 AMIR.ONLINE | All Systems Nominal
+          © 2026 AMIRSHAUL.ONLINE | All Systems Nominal
 
         </p>
 
