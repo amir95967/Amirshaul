@@ -1,10 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import * as Icons from 'lucide-react';
+import { 
+  Layout, 
+  Code2, 
+  HelpCircle, 
+  Github, 
+  ShieldCheck, 
+  ArrowUpRight 
+} from 'lucide-react';
 
-// קומפוננטה בטוחה לאייקון
+// קומפוננטה בטוחה לאייקון - מיפוי ידני למניעת שגיאות Runtime
 const SafeIcon = ({ name, size = 24, className = "" }) => {
-  const IconComponent = Icons[name] || Icons.Code2 || Icons.HelpCircle;
+  const iconsMap = { Layout, Github, ShieldCheck, ArrowUpRight, Code2 };
+  const IconComponent = iconsMap[name] || Code2 || HelpCircle;
   return <IconComponent size={size} className={className} />;
 };
 
