@@ -4,8 +4,15 @@ export default function App() {
   const [status, setStatus] = useState("");
   const canvasRef = useRef(null);
 
-  // לוגיקת המטריקס (קוד רץ)
   useEffect(() => {
+    // טעינת הסקריפט של hCaptcha
+    const script = document.createElement("script");
+    script.src = "https://web3forms.com/client/script.js";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    // לוגיקת המטריקס
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
@@ -25,14 +32,12 @@ export default function App() {
     const draw = () => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.fillStyle = '#0f0';
       ctx.font = `${fontSize}px monospace`;
 
       for (let i = 0; i < drops.length; i++) {
         const text = characters.charAt(Math.floor(Math.random() * characters.length));
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
@@ -44,14 +49,27 @@ export default function App() {
     return () => {
       clearInterval(interval);
       window.removeEventListener('resize', resizeCanvas);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // בדיקה בסיסית שהקפצ'ה מולאה
+    const captchaResponse = e.target.querySelector('[name="h-captcha-response"]')?.value;
+    if (!captchaResponse) {
+      setStatus("אנא אמת שאינך רובוט.");
+      return;
+    }
+
     setStatus("שולח פרטים...");
     const formData = new FormData(e.target);
+    
     formData.append("access_key", "dd1f530c-bc5a-4c6b-b854-4ef0aae30d00");
+    formData.append("subject", "ליד חדש מ-Amirshaul.online: " + formData.get("name"));
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
@@ -60,8 +78,10 @@ export default function App() {
       });
       const data = await response.json();
       if (data.success) {
-        setStatus("ההודעה התקבלה! נציג יחזור אליך בקרוב.");
+        setStatus("הפרטים התקבלו! נחזור אליך בהקדם.");
         e.target.reset();
+        // איפוס הקפצ'ה לאחר שליחה מוצלחת
+        if (window.hcaptcha) window.hcaptcha.reset();
       } else {
         setStatus("משהו השתבש, נסה שוב.");
       }
@@ -72,31 +92,41 @@ export default function App() {
 
   return (
     <div style={styles.container}>
-      {/* הקנבס של המטריקס */}
       <canvas ref={canvasRef} style={styles.matrixCanvas} />
 
       <nav style={styles.nav}>
         <div style={styles.logo}>AMIR<span style={styles.accentText}>SHAUL</span></div>
-        <div style={styles.navStatus}>Available for Projects</div>
       </nav>
 
       <main style={styles.main}>
         <div style={styles.heroSection}>
-          <h1 style={styles.title}>הופכים חזון לדיגיטל <br /> <span style={styles.gradientText}>עוצר נשימה.</span></h1>
+          <h1 style={styles.title}>
+            בניית אתרים <br /> 
+            <span style={styles.gradientText}>ברמה הגבוהה ביותר.</span>
+          </h1>
           <p style={styles.subtitle}>
-            אנחנו מעצבים ובונים אתרים שזוכים בפרסים, מניעים לפעולה ונראים מושלם בכל מסך. 
-            הפרויקט הגדול הבא שלך מתחיל כאן.
+            פתרונות דיגיטליים מתקדמים, קוד נקי וביצועים ללא פשרות. <br />
+            השאירו פרטים למטה ונחזור אליכם בהקדם.
           </p>
         </div>
 
         <div style={styles.glassCard}>
-          <h2 style={styles.cardTitle}>בואו נצא לדרך</h2>
+          <h2 style={styles.cardTitle}>השארת פרטים</h2>
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.row}>
-              <input type="text" name="name" required placeholder="איך קוראים לך?" style={styles.input} />
-              <input type="email" name="email" required placeholder="אימייל לחזרה" style={styles.input} />
+              <input type="text" name="name" required placeholder="שם מלא" style={styles.input} />
+              <input type="email" name="email" required placeholder="אימייל" style={styles.input} />
             </div>
-            <textarea name="message" required placeholder="ספר לנו קצת על הפרויקט..." style={styles.textarea}></textarea>
+            <textarea name="message" required placeholder="איך נוכל לעזור?" style={styles.textarea}></textarea>
+            
+            {/* רכיב ה-hCaptcha */}
+            <div 
+              className="h-captcha" 
+              data-captcha="true" 
+              data-theme="dark"
+              style={styles.captchaContainer}
+            ></div>
+
             <button type="submit" style={styles.button}>שלח הודעה</button>
           </form>
           {status && <p style={styles.statusMsg}>{status}</p>}
@@ -104,7 +134,7 @@ export default function App() {
       </main>
 
       <footer style={styles.footer}>
-        © 2026 Crafted with Passion by Amir Shaul
+        © 2026 Amir Shaul // Dev & Infra Specialist
       </footer>
     </div>
   );
@@ -112,7 +142,7 @@ export default function App() {
 
 const styles = {
   container: {
-    backgroundColor: '#000', // שיניתי לשחור מוחלט בשביל המטריקס
+    backgroundColor: '#000',
     color: '#ffffff',
     minHeight: '100vh',
     display: 'flex',
@@ -120,26 +150,30 @@ const styles = {
     fontFamily: '"Inter", sans-serif',
     direction: 'rtl',
     position: 'relative',
-    overflow: 'hidden',
+    overflowX: 'hidden',
   },
   matrixCanvas: {
-    position: 'absolute',
+    position: 'fixed',
     top: 0,
     left: 0,
     zIndex: 0,
-    opacity: 0.15, // שקיפות עדינה כדי שלא יפריע לקריאה
+    opacity: 0.15,
   },
   nav: {
-    padding: '30px 10%',
+    padding: '40px 0 20px 0',
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+    width: '100%',
   },
-  logo: { fontSize: '20px', fontWeight: '900', letterSpacing: '1px' },
+  logo: { 
+    fontSize: '24px', 
+    fontWeight: '900', 
+    letterSpacing: '2px',
+    textAlign: 'center'
+  },
   accentText: { color: '#6366f1' },
-  navStatus: { fontSize: '12px', color: '#4ade80', background: 'rgba(74, 222, 128, 0.1)', padding: '5px 12px', borderRadius: '20px' },
-  
   main: {
     flex: 1,
     display: 'flex',
@@ -149,26 +183,25 @@ const styles = {
     padding: '0 5% 50px 5%',
     zIndex: 1,
   },
-  heroSection: { textAlign: 'center', marginBottom: '50px' },
-  title: { fontSize: 'clamp(2.5rem, 7vw, 4.5rem)', fontWeight: '800', lineHeight: '1.1', marginBottom: '20px' },
+  heroSection: { textAlign: 'center', marginBottom: '40px' },
+  title: { fontSize: 'clamp(2.2rem, 8vw, 4rem)', fontWeight: '800', lineHeight: '1.2', marginBottom: '15px' },
   gradientText: {
     background: 'linear-gradient(90deg, #6366f1, #a855f7)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
   },
-  subtitle: { fontSize: '1.2rem', color: '#94a3b8', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' },
-  
+  subtitle: { fontSize: '1.1rem', color: '#94a3b8', maxWidth: '600px', margin: '0 auto', lineHeight: '1.5' },
   glassCard: {
-    background: 'rgba(15, 23, 42, 0.8)', // כהה יותר כדי לבלוט על המטריקס
+    background: 'rgba(15, 23, 42, 0.85)',
     backdropFilter: 'blur(12px)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: '24px',
     padding: '40px',
     width: '100%',
     maxWidth: '550px',
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
   },
-  cardTitle: { fontSize: '1.5rem', fontWeight: '700', marginBottom: '30px', textAlign: 'center' },
+  cardTitle: { fontSize: '1.3rem', fontWeight: '700', marginBottom: '25px', textAlign: 'center' },
   form: { display: 'flex', flexDirection: 'column', gap: '20px' },
   row: { display: 'flex', gap: '15px', flexWrap: 'wrap' },
   input: {
@@ -190,8 +223,13 @@ const styles = {
     color: '#fff',
     fontSize: '16px',
     outline: 'none',
-    height: '120px',
+    height: '100px',
     resize: 'none',
+  },
+  captchaContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    margin: '10px 0'
   },
   button: {
     background: '#6366f1',
@@ -202,8 +240,7 @@ const styles = {
     fontSize: '16px',
     fontWeight: '700',
     cursor: 'pointer',
-    transition: 'all 0.3s',
-    boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.4)',
+    transition: 'opacity 0.2s',
   },
   statusMsg: { textAlign: 'center', marginTop: '20px', color: '#4ade80', fontSize: '14px' },
   footer: { padding: '30px', textAlign: 'center', fontSize: '12px', color: '#475569', zIndex: 10 }
