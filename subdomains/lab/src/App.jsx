@@ -1,7 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function App() {
   const [status, setStatus] = useState("");
+  const canvasRef = useRef(null);
+
+  // לוגיקת המטריקס (קוד רץ)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/%=<>!&|?#@';
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(1);
+
+    const draw = () => {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#0f0';
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    };
+
+    const interval = setInterval(draw, 33);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +72,8 @@ export default function App() {
 
   return (
     <div style={styles.container}>
-      {/* אלמנטים עיצוביים ברקע */}
-      <div style={styles.blob1}></div>
-      <div style={styles.blob2}></div>
+      {/* הקנבס של המטריקס */}
+      <canvas ref={canvasRef} style={styles.matrixCanvas} />
 
       <nav style={styles.nav}>
         <div style={styles.logo}>AMIR<span style={styles.accentText}>SHAUL</span></div>
@@ -69,7 +112,7 @@ export default function App() {
 
 const styles = {
   container: {
-    backgroundColor: '#050505',
+    backgroundColor: '#000', // שיניתי לשחור מוחלט בשביל המטריקס
     color: '#ffffff',
     minHeight: '100vh',
     display: 'flex',
@@ -79,24 +122,12 @@ const styles = {
     position: 'relative',
     overflow: 'hidden',
   },
-  // עיגולי צבע מטושטשים ברקע
-  blob1: {
+  matrixCanvas: {
     position: 'absolute',
-    top: '-10%',
-    left: '-10%',
-    width: '40%',
-    height: '40%',
-    background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
+    top: 0,
+    left: 0,
     zIndex: 0,
-  },
-  blob2: {
-    position: 'absolute',
-    bottom: '10%',
-    right: '-5%',
-    width: '30%',
-    height: '30%',
-    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
-    zIndex: 0,
+    opacity: 0.15, // שקיפות עדינה כדי שלא יפריע לקריאה
   },
   nav: {
     padding: '30px 10%',
@@ -128,8 +159,8 @@ const styles = {
   subtitle: { fontSize: '1.2rem', color: '#94a3b8', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' },
   
   glassCard: {
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(20px)',
+    background: 'rgba(15, 23, 42, 0.8)', // כהה יותר כדי לבלוט על המטריקס
+    backdropFilter: 'blur(12px)',
     border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '24px',
     padding: '40px',
