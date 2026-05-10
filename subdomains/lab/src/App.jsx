@@ -5,14 +5,12 @@ export default function App() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    // טעינת הסקריפט של hCaptcha
     const script = document.createElement("script");
     script.src = "https://web3forms.com/client/script.js";
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);
 
-    // לוגיקת המטריקס
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
@@ -57,8 +55,6 @@ export default function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // בדיקה בסיסית שהקפצ'ה מולאה
     const captchaResponse = e.target.querySelector('[name="h-captcha-response"]')?.value;
     if (!captchaResponse) {
       setStatus("אנא אמת שאינך רובוט.");
@@ -67,7 +63,6 @@ export default function App() {
 
     setStatus("שולח פרטים...");
     const formData = new FormData(e.target);
-    
     formData.append("access_key", "dd1f530c-bc5a-4c6b-b854-4ef0aae30d00");
     formData.append("subject", "ליד חדש מ-Amirshaul.online: " + formData.get("name"));
 
@@ -80,7 +75,6 @@ export default function App() {
       if (data.success) {
         setStatus("הפרטים התקבלו! נחזור אליך בהקדם.");
         e.target.reset();
-        // איפוס הקפצ'ה לאחר שליחה מוצלחת
         if (window.hcaptcha) window.hcaptcha.reset();
       } else {
         setStatus("משהו השתבש, נסה שוב.");
@@ -96,6 +90,7 @@ export default function App() {
 
       <nav style={styles.nav}>
         <div style={styles.logo}>AMIR<span style={styles.accentText}>SHAUL</span></div>
+        <a href="https://form.amirshaul.online" style={styles.contactBtn}>יצירת קשר</a>
       </nav>
 
       <main style={styles.main}>
@@ -119,7 +114,6 @@ export default function App() {
             </div>
             <textarea name="message" required placeholder="איך נוכל לעזור?" style={styles.textarea}></textarea>
             
-            {/* רכיב ה-hCaptcha */}
             <div 
               className="h-captcha" 
               data-captcha="true" 
@@ -134,7 +128,7 @@ export default function App() {
       </main>
 
       <footer style={styles.footer}>
-        © 2026 Amir Shaul //
+        © 2026 Amir Shaul // Dev & Infra Specialist
       </footer>
     </div>
   );
@@ -160,20 +154,31 @@ const styles = {
     opacity: 0.15,
   },
   nav: {
-    padding: '40px 0 20px 0',
+    padding: '20px 10%',
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'space-between', // זה מפריד את הלוגו והכפתור לצדדים
     alignItems: 'center',
     zIndex: 10,
     width: '100%',
+    boxSizing: 'border-box',
   },
   logo: { 
     fontSize: '24px', 
     fontWeight: '900', 
     letterSpacing: '2px',
-    textAlign: 'center'
   },
   accentText: { color: '#6366f1' },
+  contactBtn: {
+    padding: '10px 20px',
+    borderRadius: '12px',
+    border: '1px solid #6366f1',
+    color: '#fff',
+    textDecoration: 'none',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
+    background: 'rgba(99, 102, 241, 0.1)',
+  },
   main: {
     flex: 1,
     display: 'flex',
