@@ -47,6 +47,7 @@ const MY_PROJECTS = [
 
     link: "lab.amirshaul.online",
 
+    // שימוש בגרדיאנט במקום תמונה כבדה לטעינה מיידית
     imageUrl: "https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?q=80&w=500&auto=format&fit=crop" 
 
   },
@@ -179,32 +180,9 @@ export default function App() {
 
       </div>
 
-      {/* כפתור יצירת קשר מרחף מעוצב בצד שמאל למעלה */}
-      <motion.a
-        href="https://form.amirshaul.online"
-        target="_blank"
-        rel="noreferrer"
-        className="fixed top-6 left-6 z-[100] px-5 py-3 rounded-full flex items-center space-x-3 transition-all duration-300 group
-                   bg-[#020617]/50 backdrop-blur-xl border border-cyan-500/30 text-cyan-400
-                   font-mono text-[11px] font-bold tracking-[0.25em] uppercase
-                   hover:bg-cyan-500 hover:text-black hover:border-cyan-600 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-        initial={{ opacity: 0, x: -20, scale: 0.95 }}
-        animate={{ opacity: 1, x: 0, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        whileHover={{ 
-          y: -2,
-          transition: { duration: 0.2, ease: "easeInOut" }
-        }}
-        whileTap={{ scale: 0.97 }}
-      >
-        <Mail size={16} className="transition-transform duration-300 group-hover:scale-110" />
-        <span className="relative">
-          CONTACT US
-          <span className="absolute -bottom-1 left-0 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
-        </span>
-      </motion.a>
-
       <main className="relative z-10 flex flex-col items-center w-full max-w-7xl px-6 py-24">
+
+        
 
         {/* Hero Section */}
 
@@ -264,7 +242,7 @@ export default function App() {
 
                <div className="w-px h-4 bg-white/10 self-center" />
 
-               {/* כפתור יצירת קשר מהבהב */}
+               {/* כפתור יצירת קשר מהבהב עם קישור לסאב-דומיין */}
 
                <motion.a 
                  href="https://form.amirshaul.online" 
