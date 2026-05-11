@@ -20,7 +20,7 @@ const SafeIcon = ({ name, size = 24, className = "" }) => {
 
   const iconsMap = { 
     Layout: LucideIcons.Layout, 
-    Github: LucideIcons.Github || LucideIcons.GitHub || LucideIcons.GithubIcon, 
+    Github: LucideIcons.Github || LucideIcons.GitHub, 
     ShieldCheck: LucideIcons.ShieldCheck, 
     ArrowUpRight: LucideIcons.ArrowUpRight, 
     Code2: LucideIcons.Code2, 
@@ -47,6 +47,7 @@ const MY_PROJECTS = [
 
     link: "lab.amirshaul.online",
 
+    // שימוש בגרדיאנט במקום תמונה כבדה לטעינה מיידית
     imageUrl: "https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?q=80&w=500&auto=format&fit=crop" 
 
   },
