@@ -25,7 +25,7 @@
       "alternateName": "Amir Shaul",
       "url": "https://www.amirshaul.online",
       "jobTitle": "System Administrator, Web Designer & SEO Specialist",
-      "knowsAbout": ["System Administration", "Web Design", "SEO", "IT Infrastructure"],
+      "knowsAbout": ["System Administration", "Web Design", "SEO", "IT Infrastructure", "React", "Cloud Architecture"],
       "sameAs": [
         "https://www.linkedin.com/in/amir-shaul/",
         "https://github.com/amirshaul"
@@ -52,6 +52,9 @@
         background-color: #020617;
         color: #f8fafc;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      details summary::-webkit-details-marker {
+        display: none;
       }
     </style>
   </head>
@@ -82,7 +85,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="w-full max-w-5xl mx-auto px-6 py-12 flex flex-col items-center text-center relative z-10 space-y-24">
+    <main class="w-full max-w-5xl mx-auto px-6 py-12 flex flex-col items-center text-center relative z-10 space-y-28">
 
       <!-- Hero Section -->
       <section class="flex flex-col items-center">
@@ -113,7 +116,6 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right">
           
-          <!-- Card 1 -->
           <a href="https://lab.amirshaul.online" target="_blank" rel="noreferrer" 
              class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
             <div class="flex justify-between items-start">
@@ -126,7 +128,6 @@
             </div>
           </a>
 
-          <!-- Card 2 -->
           <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
              class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
             <div class="flex justify-between items-start">
@@ -139,7 +140,6 @@
             </div>
           </a>
 
-          <!-- Card 3 -->
           <a href="https://amirshaul.online" target="_blank" rel="noreferrer" 
              class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
             <div class="flex justify-between items-start">
@@ -155,10 +155,52 @@
         </div>
       </section>
 
-      <!-- סקציה חדשה: ארכיטקטורת יכולות ותשתיות -->
+      <!-- ארגז כלים וטכנולוגיות (Tech Stack Matrix) -->
       <section class="w-full text-right">
         <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
-          <span>// CORE INFRASTRUCTURE & STACK</span>
+          <span>// TECH STACK & TOOLS</span>
+          <span class="text-cyan-400">ECOSYSTEM</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
+          <div class="p-4 rounded-xl bg-slate-900/30 border border-white/5 flex flex-col justify-between h-28">
+            <span class="text-cyan-400 text-[10px]">INFRASTRUCTURE</span>
+            <div>
+              <div class="font-bold text-white">Linux & Windows</div>
+              <div class="text-slate-500 text-[10px]">Server Administration</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/30 border border-white/5 flex flex-col justify-between h-28">
+            <span class="text-cyan-400 text-[10px]">NETWORKING</span>
+            <div>
+              <div class="font-bold text-white">DNS / VPN / DHCP</div>
+              <div class="text-slate-500 text-[10px]">Protocols & Routing</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/30 border border-white/5 flex flex-col justify-between h-28">
+            <span class="text-cyan-400 text-[10px]">FRONTEND</span>
+            <div>
+              <div class="font-bold text-white">React & Tailwind</div>
+              <div class="text-slate-500 text-[10px]">Fast UI Frameworks</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/30 border border-white/5 flex flex-col justify-between h-28">
+            <span class="text-cyan-400 text-[10px]">SEARCH & GROWTH</span>
+            <div>
+              <div class="font-bold text-white">Technical SEO</div>
+              <div class="text-slate-500 text-[10px]">Search Console / Schema</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ארכיטקטורת יכולות ותשתיות -->
+      <section class="w-full text-right">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
+          <span>// CORE INFRASTRUCTURE & ARCHITECTURE</span>
           <span class="text-cyan-400">SPECS</span>
         </div>
 
@@ -183,7 +225,44 @@
         </div>
       </section>
 
-      <!-- סקציה חדשה: תהליך עבודה (Workflow) -->
+      <!-- ציר זמן ניסיון מקצועי (Experience Timeline) -->
+      <section class="w-full text-right">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
+          <span>// PROFESSIONAL TIMELINE</span>
+          <span class="text-cyan-400">HISTORY</span>
+        </div>
+
+        <div class="space-y-6">
+          <div class="p-6 rounded-2xl bg-slate-900/30 border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span class="text-cyan-400 font-mono text-xs">2025 - PRESENT</span>
+              <h3 class="text-lg font-bold text-white mt-1">IT System Engineer</h3>
+              <p class="text-slate-400 text-xs mt-1">ניהול תשתיות IT, סיסטם ארגוני, שרתי ענן ואבטחת מידע.</p>
+            </div>
+            <span class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-mono rounded-full self-start md:self-center">ACTIVE</span>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-slate-900/20 border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span class="text-slate-500 font-mono text-xs">2024 - 2025</span>
+              <h3 class="text-lg font-bold text-white mt-1">IT Administrator</h3>
+              <p class="text-slate-400 text-xs mt-1">ניהול מערכות מידע, תמיכה בתשתיות רשת מורכבות ואינטגרציות מחשוב.</p>
+            </div>
+            <span class="px-3 py-1 bg-slate-800 text-slate-400 text-[10px] font-mono rounded-full self-start md:self-center">COMPLETED</span>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-slate-900/20 border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span class="text-slate-500 font-mono text-xs">2020 - 2023</span>
+              <h3 class="text-lg font-bold text-white mt-1">IDF IT Specialist & SAP Manager</h3>
+              <p class="text-slate-400 text-xs mt-1">ניהול מערכות מידע מבצעיות, ניהול הרשאות SAP ופריסת פתרונות מחשוב צבאיים.</p>
+            </div>
+            <span class="px-3 py-1 bg-slate-800 text-slate-400 text-[10px] font-mono rounded-full self-start md:self-center">MILITARY</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- תהליך עבודה (Workflow Pipeline) -->
       <section class="w-full text-right">
         <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
           <span>// DEPLOYMENT WORKFLOW</span>
@@ -209,6 +288,58 @@
             <p class="text-slate-500 text-[11px]">הגדרות אינדוקס לגוגל, סריקת AI ובדיקות תקינות מלאות.</p>
           </div>
         </div>
+      </section>
+
+      <!-- שאלות נפוצות (Interactive FAQ) -->
+      <section class="w-full text-right">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
+          <span>// FREQUENTLY ASKED QUESTIONS</span>
+          <span class="text-cyan-400">FAQ</span>
+        </div>
+
+        <div class="space-y-4 font-sans">
+          <details class="group p-5 rounded-2xl bg-slate-900/30 border border-white/5 cursor-pointer">
+            <summary class="flex justify-between items-center text-sm font-bold text-white list-none">
+              <span>באילו תחומים מתמקד השירות?</span>
+              <span class="text-cyan-400 text-lg transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+              התמחות רב-תחומית המשלבת ניהול תשתיות IT וסיסטם ארגוני, בנייה ועיצוב של אתרי אינטרנט מהירים ומודרניים, וביצוע אופטימיזציה מקיפה למנועי חיפוש (SEO).
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-2xl bg-slate-900/30 border border-white/5 cursor-pointer">
+            <summary class="flex justify-between items-center text-sm font-bold text-white list-none">
+              <span>כיצד מובטחת מהירות האתר בטלפונים ניידים?</span>
+              <span class="text-cyan-400 text-lg transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+              הקוד נבנה בארכיטקטורה קלת-משקל ללא ספריות מיותרות, תוך שימוש ב-Tailwind CSS, דחיסת משאבים והתאמה ישירה למדדי ה-Core Web Vitals של גוגל.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-2xl bg-slate-900/30 border border-white/5 cursor-pointer">
+            <summary class="flex justify-between items-center text-sm font-bold text-white list-none">
+              <span>איך מתבצע תהליך העבודה על פרויקט חדש?</span>
+              <span class="text-cyan-400 text-lg transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+              התהליך כולל אפיון דרישות ראשוני, בחירת תשתית ענן מתאימה, פיתוח ועיצוב הממשק, בדיקות ביצועים מקיפות והשקה מלאה עם חיבור ל-Google Search Console.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <!-- אזור יצירת קשר מהיר (CTA) -->
+      <section class="w-full p-8 md:p-12 rounded-3xl bg-gradient-to-b from-slate-900/60 to-slate-950 border border-cyan-500/20 flex flex-col items-center text-center space-y-6">
+        <h2 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">מוכנים להתחיל פרויקט?</h2>
+        <p class="text-slate-400 text-xs md:text-sm max-w-md leading-relaxed">
+          בין אם מדובר בהקמת תשתית IT מאובטחת, עיצוב אתר חדש או קידום דיגיטלי – שלחו הודעה ונתחיל.
+        </p>
+        <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer"
+           class="px-8 py-3.5 bg-cyan-500 text-black font-mono font-bold text-xs rounded-full uppercase tracking-widest hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+          שליחת פנייה ישירה
+        </a>
       </section>
 
       <!-- פס טעינה / סטטוס מערכת תחתון -->
