@@ -10,7 +10,6 @@ import {
   Github 
 } from 'lucide-react';
 
-// מיפוי אייקונים ישיר וקל משקל
 const iconsMap = {
   Layout,
   Github,
@@ -32,44 +31,37 @@ const MY_PROJECTS = [
     title: "Lab Instance",
     desc: "ניסויים ב-Frontend ורכיבי React מתקדמים.",
     link: "lab.amirshaul.online",
-    gradient: "from-cyan-950/40 via-[#020617] to-[#020617]"
+    gradient: "from-cyan-950/30 via-[#020617] to-[#020617]"
   },
   {
     iconName: "ShieldCheck",
     title: "Secure Form",
     desc: "מערכת יצירת קשר מאובטחת עם הגנת ספאם.",
     link: "form.amirshaul.online",
-    gradient: "from-blue-950/40 via-[#020617] to-[#020617]"
+    gradient: "from-blue-950/30 via-[#020617] to-[#020617]"
   },
   {
     iconName: "Code2",
     title: "Core System",
     desc: "ארכיטקטורת מערכת מבוססת Vercel ו-Vite.",
     link: "amirshaul.online",
-    gradient: "from-purple-950/40 via-[#020617] to-[#020617]"
+    gradient: "from-purple-950/30 via-[#020617] to-[#020617]"
   },
 ];
 
 const ProjectCard = ({ iconName, title, desc, link, gradient }) => (
-  <motion.div 
-    whileHover={{ y: -10 }}
-    className="relative group h-[400px] rounded-3xl overflow-hidden border border-white/10 bg-[#020617]"
-  >
-    {/* רקע גרדיאנט קל משקל שנטען מיידית */}
-    <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-100 transition-opacity duration-500`} />
+  <div className="relative group h-[400px] rounded-3xl overflow-hidden border border-white/10 bg-[#020617] transition-transform duration-300 hover:-translate-y-2">
+    {/* רקע גרדיאנט קל משקל */}
+    <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-100 transition-opacity duration-300`} />
     
     {/* שכבת עומק כהה */}
     <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent" />
 
     {/* תוכן הכרטיס */}
     <div className="relative h-full p-8 flex flex-col items-center text-center justify-end z-10">
-      <motion.div 
-        initial={{ y: 20, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        className="w-16 h-16 rounded-2xl bg-cyan-500/20 backdrop-blur-xl flex items-center justify-center mb-6 text-cyan-400 border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-black transition-all duration-500"
-      >
+      <div className="w-16 h-16 rounded-2xl bg-cyan-950/60 flex items-center justify-center mb-6 text-cyan-400 border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-black transition-all duration-300">
         <SafeIcon name={iconName} size={32} />
-      </motion.div>
+      </div>
       
       <h3 className="text-2xl font-black mb-3 text-white uppercase tracking-tighter">{title}</h3>
       <p className="text-slate-300 text-sm mb-8 leading-relaxed max-w-[240px] font-medium drop-shadow-md">
@@ -87,54 +79,38 @@ const ProjectCard = ({ iconName, title, desc, link, gradient }) => (
         <SafeIcon name="ArrowUpRight" size={14} />
       </a>
     </div>
-  </motion.div>
+  </div>
 );
 
 export default function App() {
   return (
     <div className="min-h-screen bg-[#020617] w-full flex flex-col items-center relative overflow-hidden font-sans">
       
-      {/* Background Glows */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[140px]" />
-        <div className="absolute bottom-[-10%] right-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[140px]" />
-      </div>
+      {/* Background Glows מותאם לביצועים ללא חישובי Blur כבדים */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_rgba(6,182,212,0.15),transparent_60%)]" />
 
       {/* כפתור יצירת קשר מרחף */}
-      <motion.a
+      <a
         href="https://form.amirshaul.online"
         target="_blank"
         rel="noreferrer"
         className="fixed top-6 left-6 z-[100] px-5 py-3 rounded-full flex items-center space-x-3 transition-all duration-300 group
-                   bg-[#020617]/50 backdrop-blur-xl border border-cyan-500/30 text-cyan-400
+                   bg-[#020617]/90 border border-cyan-500/30 text-cyan-400
                    font-mono text-[11px] font-bold tracking-[0.25em] uppercase
                    hover:bg-cyan-500 hover:text-black hover:border-cyan-600 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-        initial={{ opacity: 0, x: -20, scale: 0.95 }}
-        animate={{ opacity: 1, x: 0, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        whileHover={{ 
-          y: -2,
-          transition: { duration: 0.2, ease: "easeInOut" }
-        }}
-        whileTap={{ scale: 0.97 }}
       >
         <Mail size={16} className="transition-transform duration-300 group-hover:scale-110" />
         <span className="relative">
           CONTACT US
           <span className="absolute -bottom-1 left-0 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
         </span>
-      </motion.a>
+      </a>
 
       <main className="relative z-10 flex flex-col items-center w-full max-w-7xl px-6 py-24">
 
         {/* Hero Section */}
         <section className="text-center mb-32 flex flex-col items-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex flex-col items-center"
-          >
+          <div className="flex flex-col items-center">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold tracking-[0.3em] text-cyan-400 uppercase mb-10">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
@@ -148,7 +124,6 @@ export default function App() {
               <span className="text-slate-400 not-italic">Shaul</span>
             </h1>
 
-            {/* כותרת משנה משופרת ל-SEO ולנראות */}
             <p className="text-sm md:text-xl text-cyan-400 font-mono tracking-widest max-w-2xl mx-auto mb-4 uppercase font-semibold">
               SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO
             </p>
@@ -187,7 +162,7 @@ export default function App() {
                  <span className="text-xs font-black tracking-widest uppercase text-slate-400">Verified</span>
                </div>
             </div>
-          </motion.div>
+          </div>
         </section>
 
         {/* Project Grid */}
