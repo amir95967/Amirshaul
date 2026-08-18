@@ -79,9 +79,11 @@
         <!-- כפתור החלפת ערכת נושא (Dark / Light) -->
         <button id="theme-toggle" type="button" aria-label="Toggle theme"
                 class="w-9 h-9 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all duration-200 hover:border-cyan-500 hover:text-cyan-500 shadow-sm">
+          <!-- Moon Icon (Dark Mode) -->
           <svg id="theme-icon-moon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
           </svg>
+          <!-- Sun Icon (Light Mode) -->
           <svg id="theme-icon-sun" class="w-4 h-4 block dark:hidden text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
@@ -121,84 +123,50 @@
         </p>
       </section>
 
-      <!-- סקציה חדשה: Web Projects Live Previews (iframe Showcases) -->
-      <section class="w-full text-right">
+      <!-- Projects Grid -->
+      <section class="w-full">
         <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200 dark:border-white/5 font-mono text-xs text-slate-500 dark:text-slate-400 uppercase">
-          <span>// INTERACTIVE WEB SHOWCASE</span>
-          <span class="text-cyan-600 dark:text-cyan-400">LIVE IFRAMES</span>
+          <span>// INSTANCES & SERVICES</span>
+          <span class="text-cyan-600 dark:text-cyan-400">03 ACTIVE NODES</span>
         </div>
 
-        <div class="space-y-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right">
           
-          <!-- פרויקט 1: Lab Instance -->
-          <div class="rounded-3xl bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 overflow-hidden shadow-lg transition-all duration-300">
-            <!-- סרגל דפדפן עליון (Browser Top Bar) -->
-            <div class="px-6 py-3 bg-slate-100 dark:bg-slate-950/80 border-b border-slate-200 dark:border-white/5 flex items-center justify-between font-mono text-xs">
-              <div class="flex items-center space-x-2 space-x-reverse">
-                <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
-                <span class="text-slate-400 text-[11px] mr-2">lab.amirshaul.online</span>
-              </div>
-              <a href="https://lab.amirshaul.online" target="_blank" rel="noreferrer" class="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center space-x-1 space-x-reverse text-[11px]">
-                <span>פתיחה במסך מלא</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-              </a>
+          <a href="https://lab.amirshaul.online" target="_blank" rel="noreferrer" 
+             class="group p-8 rounded-2xl bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 hover:border-cyan-500/50 hover:bg-white dark:hover:bg-slate-900/80 shadow-sm transition-all duration-300 flex flex-col justify-between h-56">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-mono text-cyan-600 dark:text-cyan-400 tracking-wider uppercase">01 / Instance</span>
+              <svg class="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-cyan-500 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
             </div>
-            <!-- חלון ה-iframe החי -->
-            <div class="relative w-full h-[450px] bg-slate-950">
-              <iframe 
-                src="https://lab.amirshaul.online" 
-                title="Lab Instance Preview" 
-                loading="lazy"
-                class="w-full h-full border-0"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              ></iframe>
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">SEO & Growth</h2>
+              <p class="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">קידום אתרים אורגני, ניתוח נתונים ואופטימיזציה למנועי חיפוש.</p>
             </div>
-            <!-- תיאור הפרויקט -->
-            <div class="p-6 bg-white/50 dark:bg-slate-900/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Lab Instance – מעבדת רכיבים ו-Frontend</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">בדיקות ממשק משתמש, רכיבי React ואופטימיזציית ביצועים בזמן אמת.</p>
-              </div>
-              <span class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-mono rounded-full self-start md:self-center">REACT / VITE</span>
-            </div>
-          </div>
+          </a>
 
-          <!-- פרויקט 2: Secure Form -->
-          <div class="rounded-3xl bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 overflow-hidden shadow-lg transition-all duration-300">
-            <!-- סרגל דפדפן עליון -->
-            <div class="px-6 py-3 bg-slate-100 dark:bg-slate-950/80 border-b border-slate-200 dark:border-white/5 flex items-center justify-between font-mono text-xs">
-              <div class="flex items-center space-x-2 space-x-reverse">
-                <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
-                <span class="text-slate-400 text-[11px] mr-2">form.amirshaul.online</span>
-              </div>
-              <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center space-x-1 space-x-reverse text-[11px]">
-                <span>פתיחה במסך מלא</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-              </a>
+          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
+             class="group p-8 rounded-2xl bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 hover:border-cyan-500/50 hover:bg-white dark:hover:bg-slate-900/80 shadow-sm transition-all duration-300 flex flex-col justify-between h-56">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-mono text-cyan-600 dark:text-cyan-400 tracking-wider uppercase">02 / Instance</span>
+              <svg class="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-cyan-500 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
             </div>
-            <!-- חלון ה-iframe החי -->
-            <div class="relative w-full h-[450px] bg-slate-950">
-              <iframe 
-                src="https://form.amirshaul.online" 
-                title="Secure Form Preview" 
-                loading="lazy"
-                class="w-full h-full border-0"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              ></iframe>
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">System Admin</h2>
+              <p class="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">איש סיסטם, תשתיות IT, אבטחת מידע וניהול שרתים.</p>
             </div>
-            <!-- תיאור הפרויקט -->
-            <div class="p-6 bg-white/50 dark:bg-slate-900/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Secure Form – מערכת יצירת קשר מאובטחת</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">טופס חכם עם אימות קלט, מניעת בוטים וספאם, וניתוב ישיר.</p>
-              </div>
-              <span class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-mono rounded-full self-start md:self-center">SECURITY & API</span>
+          </a>
+
+          <a href="https://amirshaul.online" target="_blank" rel="noreferrer" 
+             class="group p-8 rounded-2xl bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 hover:border-cyan-500/50 hover:bg-white dark:hover:bg-slate-900/80 shadow-sm transition-all duration-300 flex flex-col justify-between h-56">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-mono text-cyan-600 dark:text-cyan-400 tracking-wider uppercase">03 / Instance</span>
+              <svg class="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-cyan-500 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
             </div>
-          </div>
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Web Designer</h2>
+              <p class="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">עיצוב ופיתוח אתרים מהירים במיוחד בסטנדרט פרימיום.</p>
+            </div>
+          </a>
 
         </div>
       </section>
@@ -273,6 +241,71 @@
         </div>
       </section>
 
+      <!-- ציר זמן ניסיון מקצועי (Experience Timeline) -->
+      <section class="w-full text-right">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200 dark:border-white/5 font-mono text-xs text-slate-500 dark:text-slate-400 uppercase">
+          <span>// PROFESSIONAL TIMELINE</span>
+          <span class="text-cyan-600 dark:text-cyan-400">HISTORY</span>
+        </div>
+
+        <div class="space-y-6">
+          <div class="p-6 rounded-2xl bg-white/60 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+            <div>
+              <span class="text-cyan-600 dark:text-cyan-400 font-mono text-xs">2025 - PRESENT</span>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1">IT System Engineer</h3>
+              <p class="text-slate-600 dark:text-slate-400 text-xs mt-1">ניהול תשתיות IT, סיסטם ארגוני, שרתי ענן ואבטחת מידע.</p>
+            </div>
+            <span class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-mono rounded-full self-start md:self-center">ACTIVE</span>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-white/60 dark:bg-slate-900/20 border border-slate-200 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+            <div>
+              <span class="text-slate-500 font-mono text-xs">2024 - 2025</span>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1">IT Administrator</h3>
+              <p class="text-slate-600 dark:text-slate-400 text-xs mt-1">ניהול מערכות מידע, תמיכה בתשתיות רשת מורכבות ואינטגרציות מחשוב.</p>
+            </div>
+            <span class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-mono rounded-full self-start md:self-center">COMPLETED</span>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-white/60 dark:bg-slate-900/20 border border-slate-200 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+            <div>
+              <span class="text-slate-500 font-mono text-xs">2020 - 2023</span>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1">IDF IT Specialist & SAP Manager</h3>
+              <p class="text-slate-600 dark:text-slate-400 text-xs mt-1">ניהול מערכות מידע מבצעיות, ניהול הרשאות SAP ופריסת פתרונות מחשוב צבאיים.</p>
+            </div>
+            <span class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-mono rounded-full self-start md:self-center">MILITARY</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- תהליך עבודה (Workflow Pipeline) -->
+      <section class="w-full text-right">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200 dark:border-white/5 font-mono text-xs text-slate-500 dark:text-slate-400 uppercase">
+          <span>// DEPLOYMENT WORKFLOW</span>
+          <span class="text-cyan-600 dark:text-cyan-400">PIPELINE</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+          <div class="p-5 rounded-xl bg-white/60 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 shadow-sm">
+            <span class="text-cyan-600 dark:text-cyan-400 text-[10px] block mb-2">PHASE 01</span>
+            <div class="font-bold text-slate-900 dark:text-white text-sm mb-1">Architecture</div>
+            <p class="text-slate-500 text-[11px]">אפיון תשתיות, דרישות מערכת ואבטחת מידע.</p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-white/60 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 shadow-sm">
+            <span class="text-cyan-600 dark:text-cyan-400 text-[10px] block mb-2">PHASE 02</span>
+            <div class="font-bold text-slate-900 dark:text-white text-sm mb-1">Development</div>
+            <p class="text-slate-500 text-[11px]">פיתוח נקי, עיצוב UI מדויק והתאמת קוד למהירות מקסימלית.</p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-white/60 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 shadow-sm">
+            <span class="text-cyan-600 dark:text-cyan-400 text-[10px] block mb-2">PHASE 03</span>
+            <div class="font-bold text-slate-900 dark:text-white text-sm mb-1">SEO & Launch</div>
+            <p class="text-slate-500 text-[11px]">הגדרות אינדוקס לגוגל, סריקת AI ובדיקות תקינות מלאות.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- שאלות נפוצות (Interactive FAQ) -->
       <section class="w-full text-right">
         <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200 dark:border-white/5 font-mono text-xs text-slate-500 dark:text-slate-400 uppercase">
@@ -298,6 +331,16 @@
             </summary>
             <p class="text-xs text-slate-600 dark:text-slate-400 mt-3 leading-relaxed">
               הקוד נבנה בארכיטקטורה קלת-משקל ללא ספריות מיותרות, תוך שימוש ב-Tailwind CSS, דחיסת משאבים והתאמה ישירה למדדי ה-Core Web Vitals של גוגל.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-2xl bg-white/60 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 cursor-pointer shadow-sm">
+            <summary class="flex justify-between items-center text-sm font-bold text-slate-900 dark:text-white list-none">
+              <span>איך מתבצע תהליך העבודה על פרויקט חדש?</span>
+              <span class="text-cyan-600 dark:text-cyan-400 text-lg transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-3 leading-relaxed">
+              התהליך כולל אפיון דרישות ראשוני, בחירת תשתית ענן מתאימה, פיתוח ועיצוב הממשק, בדיקות ביצועים מקיפות והשקה מלאה עם חיבור ל-Google Search Console.
             </p>
           </details>
         </div>
@@ -347,10 +390,12 @@
       © 2026 AMIRSHAUL.ONLINE | ALL SYSTEMS NOMINAL
     </footer>
 
-    <!-- סקריפטים: התקדמות גלילה + החלפת Theme -->
+    <!-- סקריפטים: חישוב התקדמות גלילה + החלפת Theme -->
     <script>
+      // ניהול Dark / Light Mode
       const themeToggleBtn = document.getElementById('theme-toggle');
       
+      // בדיקת העדפה שמורה או ברירת מחדל כהה
       if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
         document.documentElement.classList.remove('dark');
       } else {
@@ -367,6 +412,7 @@
         }
       });
 
+      // ניהול Scroll Progress Bar
       function updateScrollProgress() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
