@@ -53,19 +53,12 @@
         color: #f8fafc;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
-      @keyframes pulseBar {
-        0%, 100% { opacity: 0.6; }
-        50% { opacity: 1; }
-      }
-      .animate-pulse-bar {
-        animation: pulseBar 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
     </style>
   </head>
   <body class="bg-brandDark min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
 
-    <!-- פס התקדמות טעינה עליון לפי גלילה -->
-    <div id="scroll-progress" class="fixed top-0 right-0 left-0 h-[2px] bg-gradient-to-l from-cyan-400 via-cyan-500 to-blue-600 z-50 transition-all duration-75 w-0"></div>
+    <!-- פס התקדמות טעינה עליון (Scroll Progress Bar) -->
+    <div id="scroll-progress" class="fixed top-0 right-0 left-0 h-[3px] bg-gradient-to-l from-cyan-400 via-cyan-500 to-blue-600 z-50 transition-all duration-75 w-0 shadow-[0_0_12px_rgba(6,182,212,0.8)]"></div>
 
     <!-- רקע גרדיאנט קל משקל -->
     <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),transparent_70%)]"></div>
@@ -89,84 +82,148 @@
     </header>
 
     <!-- Main Content -->
-    <main class="w-full max-w-5xl mx-auto px-6 py-12 flex flex-col items-center text-center relative z-10">
+    <main class="w-full max-w-5xl mx-auto px-6 py-12 flex flex-col items-center text-center relative z-10 space-y-24">
 
-      <!-- Status Tag -->
-      <div class="inline-flex items-center space-x-2 space-x-reverse px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[11px] font-mono tracking-widest text-cyan-400 uppercase mb-8">
-        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-        <span>IT SYSTEM ENGINEER</span>
-      </div>
+      <!-- Hero Section -->
+      <section class="flex flex-col items-center">
+        <div class="inline-flex items-center space-x-2 space-x-reverse px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[11px] font-mono tracking-widest text-cyan-400 uppercase mb-8">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span>IT SYSTEM ENGINEER</span>
+        </div>
 
-      <!-- Main Title -->
-      <h1 class="text-6xl md:text-8xl font-black tracking-tighter uppercase text-white mb-4 italic">
-        Amir.<span class="text-slate-500 not-italic">Shaul</span>
-      </h1>
+        <h1 class="text-6xl md:text-8xl font-black tracking-tighter uppercase text-white mb-4 italic">
+          Amir.<span class="text-slate-500 not-italic">Shaul</span>
+        </h1>
 
-      <p class="text-xs md:text-sm font-mono tracking-widest text-cyan-400 uppercase font-semibold mb-4">
-        SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO
-      </p>
+        <p class="text-xs md:text-sm font-mono tracking-widest text-cyan-400 uppercase font-semibold mb-4">
+          SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO
+        </p>
 
-      <p class="text-slate-300 text-base md:text-xl max-w-xl mx-auto mb-16 font-light leading-relaxed">
-        ארכיטקטורת מערכות IT, ניהול תשתיות ענן, עיצוב ופיתוח פתרונות Web מתקדמים.
-      </p>
+        <p class="text-slate-300 text-base md:text-xl max-w-xl mx-auto font-light leading-relaxed">
+          ארכיטקטורת מערכות IT, ניהול תשתיות ענן, עיצוב ופיתוח פתרונות Web מתקדמים.
+        </p>
+      </section>
 
       <!-- Projects Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right mb-16">
-        
-        <!-- Card 1 -->
-        <a href="https://lab.amirshaul.online" target="_blank" rel="noreferrer" 
-           class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
-          <div class="flex justify-between items-start">
-            <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">03 / </span>
-            <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-white mb-2">SEO</h2>
-            <p class="text-slate-400 text-xs leading-relaxed">קידום אתרים אורגני</p>
-          </div>
-        </a>
+      <section class="w-full">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
+          <span>// INSTANCES & SERVICES</span>
+          <span class="text-cyan-400">03 ACTIVE NODES</span>
+        </div>
 
-        <!-- Card 2 -->
-        <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
-           class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
-          <div class="flex justify-between items-start">
-            <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">02 / </span>
-            <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-white mb-2">System administrator</h2>
-            <p class="text-slate-400 text-xs leading-relaxed">איש סיסטם, תשתיות וIT</p>
-          </div>
-        </a>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right">
+          
+          <!-- Card 1 -->
+          <a href="https://lab.amirshaul.online" target="_blank" rel="noreferrer" 
+             class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">01 / Instance</span>
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white mb-2">SEO & Growth</h2>
+              <p class="text-slate-400 text-xs leading-relaxed">קידום אתרים אורגני, ניתוח נתונים ואופטימיזציה למנועי חיפוש.</p>
+            </div>
+          </a>
 
-        <!-- Card 3 -->
-        <a href="https://amirshaul.online" target="_blank" rel="noreferrer" 
-           class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
-          <div class="flex justify-between items-start">
-            <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">01 / </span>
-            <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-white mb-2">Web Designer</h2>
-            <p class="text-slate-400 text-xs leading-relaxed">עיצוב ובניית אתרים ברמה גבוהה</p>
-          </div>
-        </a>
+          <!-- Card 2 -->
+          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
+             class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">02 / Instance</span>
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white mb-2">System Admin</h2>
+              <p class="text-slate-400 text-xs leading-relaxed">איש סיסטם, תשתיות IT, אבטחת מידע וניהול שרתים.</p>
+            </div>
+          </a>
 
-      </div>
+          <!-- Card 3 -->
+          <a href="https://amirshaul.online" target="_blank" rel="noreferrer" 
+             class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">03 / Instance</span>
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white mb-2">Web Designer</h2>
+              <p class="text-slate-400 text-xs leading-relaxed">עיצוב ופיתוח אתרים מהירים במיוחד בסטנדרט פרימיום.</p>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- סקציה חדשה: ארכיטקטורת יכולות ותשתיות -->
+      <section class="w-full text-right">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
+          <span>// CORE INFRASTRUCTURE & STACK</span>
+          <span class="text-cyan-400">SPECS</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-6 rounded-2xl bg-slate-900/20 border border-white/5 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center space-x-2 space-x-reverse text-cyan-400">
+              <span>תשתיות ענן ורשתות</span>
+            </h3>
+            <p class="text-slate-400 text-xs leading-relaxed">
+              ניהול שרתי Linux/Windows, תצורת DNS ודומיינים, הגדרות CDN (Cloudflare/Vercel), שירותי Active Directory ואבטחת מידע ארגונית.
+            </p>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-slate-900/20 border border-white/5 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center space-x-2 space-x-reverse text-cyan-400">
+              <span>פיתוח ועיצוב Frontend</span>
+            </h3>
+            <p class="text-slate-400 text-xs leading-relaxed">
+              בניית ממשקים רספונסיביים מהירים, React, Tailwind CSS, אופטימיזציית Core Web Vitals וטעינה מיידית ללא תלויות כבדות.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- סקציה חדשה: תהליך עבודה (Workflow) -->
+      <section class="w-full text-right">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 font-mono text-xs text-slate-400 uppercase">
+          <span>// DEPLOYMENT WORKFLOW</span>
+          <span class="text-cyan-400">PIPELINE</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+          <div class="p-5 rounded-xl bg-slate-900/30 border border-white/5">
+            <span class="text-cyan-400 text-[10px] block mb-2">PHASE 01</span>
+            <div class="font-bold text-white text-sm mb-1">Architecture</div>
+            <p class="text-slate-500 text-[11px]">אפיון תשתיות, דרישות מערכת ואבטחת מידע.</p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900/30 border border-white/5">
+            <span class="text-cyan-400 text-[10px] block mb-2">PHASE 02</span>
+            <div class="font-bold text-white text-sm mb-1">Development</div>
+            <p class="text-slate-500 text-[11px]">פיתוח נקי, עיצוב UI מדויק והתאמת קוד למהירות מקסימלית.</p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900/30 border border-white/5">
+            <span class="text-cyan-400 text-[10px] block mb-2">PHASE 03</span>
+            <div class="font-bold text-white text-sm mb-1">SEO & Launch</div>
+            <p class="text-slate-500 text-[11px]">הגדרות אינדוקס לגוגל, סריקת AI ובדיקות תקינות מלאות.</p>
+          </div>
+        </div>
+      </section>
 
       <!-- פס טעינה / סטטוס מערכת תחתון -->
-      <div class="w-full max-w-md flex flex-col items-center space-y-3 p-4 rounded-xl bg-slate-900/30 border border-white/5 font-mono">
-        <div class="w-full flex justify-between text-[10px] text-cyan-400/80 tracking-widest uppercase">
+      <section class="w-full max-w-md flex flex-col items-center space-y-3 p-5 rounded-2xl bg-slate-900/40 border border-white/10 font-mono">
+        <div class="w-full flex justify-between text-[11px] text-cyan-400 tracking-widest uppercase font-bold">
           <span class="flex items-center space-x-1.5 space-x-reverse">
-            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
             <span>SYSTEM MONITOR</span>
           </span>
           <span id="scroll-percentage">0% LOADED</span>
         </div>
-        <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-white/10">
-          <div id="status-bar" class="bg-gradient-to-l from-cyan-400 to-blue-500 h-full rounded-full w-0 transition-all duration-150"></div>
+        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/10">
+          <div id="status-bar" class="bg-gradient-to-l from-cyan-400 to-blue-500 h-full rounded-full w-0 transition-all duration-100"></div>
         </div>
-      </div>
+      </section>
 
     </main>
 
@@ -175,7 +232,7 @@
       © 2026 AMIRSHAUL.ONLINE | ALL SYSTEMS NOMINAL
     </footer>
 
-    <!-- סקריפט חישוב התקדמות קל משקל -->
+    <!-- סקריפט חישוב התקדמות גלילה -->
     <script>
       function updateScrollProgress() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
