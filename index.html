@@ -33,7 +33,7 @@
     }
     </script>
 
-    <!-- Tailwind Play CDN - טעינה אולטרה-מהירה -->
+    <!-- Tailwind Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -53,9 +53,19 @@
         color: #f8fafc;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
+      @keyframes pulseBar {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+      .animate-pulse-bar {
+        animation: pulseBar 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
     </style>
   </head>
   <body class="bg-brandDark min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
+
+    <!-- פס התקדמות טעינה עליון לפי גלילה -->
+    <div id="scroll-progress" class="fixed top-0 right-0 left-0 h-[2px] bg-gradient-to-l from-cyan-400 via-cyan-500 to-blue-600 z-50 transition-all duration-75 w-0"></div>
 
     <!-- רקע גרדיאנט קל משקל -->
     <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),transparent_70%)]"></div>
@@ -101,7 +111,7 @@
       </p>
 
       <!-- Projects Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right mb-16">
         
         <!-- Card 1 -->
         <a href="https://lab.amirshaul.online" target="_blank" rel="noreferrer" 
@@ -143,12 +153,48 @@
         </a>
 
       </div>
+
+      <!-- פס טעינה / סטטוס מערכת תחתון -->
+      <div class="w-full max-w-md flex flex-col items-center space-y-3 p-4 rounded-xl bg-slate-900/30 border border-white/5 font-mono">
+        <div class="w-full flex justify-between text-[10px] text-cyan-400/80 tracking-widest uppercase">
+          <span class="flex items-center space-x-1.5 space-x-reverse">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span>SYSTEM MONITOR</span>
+          </span>
+          <span id="scroll-percentage">0% LOADED</span>
+        </div>
+        <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-white/10">
+          <div id="status-bar" class="bg-gradient-to-l from-cyan-400 to-blue-500 h-full rounded-full w-0 transition-all duration-150"></div>
+        </div>
+      </div>
+
     </main>
 
     <!-- Footer -->
     <footer class="w-full text-center py-8 border-t border-white/5 relative z-10 text-[11px] font-mono tracking-widest text-slate-500 uppercase">
       © 2026 AMIRSHAUL.ONLINE | ALL SYSTEMS NOMINAL
     </footer>
+
+    <!-- סקריפט חישוב התקדמות קל משקל -->
+    <script>
+      function updateScrollProgress() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = scrollHeight > 0 ? Math.min(100, Math.round((scrollTop / scrollHeight) * 100)) : 100;
+        
+        const topBar = document.getElementById('scroll-progress');
+        const statusBar = document.getElementById('status-bar');
+        const percentageText = document.getElementById('scroll-percentage');
+
+        if (topBar) topBar.style.width = progress + '%';
+        if (statusBar) statusBar.style.width = progress + '%';
+        if (percentageText) percentageText.textContent = progress + '% LOADED';
+      }
+
+      window.addEventListener('scroll', updateScrollProgress, { passive: true });
+      window.addEventListener('resize', updateScrollProgress, { passive: true });
+      updateScrollProgress();
+    </script>
 
   </body>
 </html>
