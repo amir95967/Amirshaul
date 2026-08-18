@@ -1,19 +1,22 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     
+    <!-- SEO & Metadata -->
     <title>אמיר שאול | Amir Shaul - SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO</title>
     <meta name="description" content="SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO - פתרונות מחשוב ותשתיות IT, עיצוב ופיתוח אתרים, ואופטימיזציה למנועי חיפוש מאת אמיר שאול." />
     <link rel="canonical" href="https://www.amirshaul.online/" />
 
+    <!-- Open Graph -->
     <meta property="og:title" content="אמיר שאול | Amir Shaul - SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO" />
     <meta property="og:description" content="פתרונות מחשוב ותשתיות IT, עיצוב ופיתוח אתרים, ואופטימיזציה למנועי חיפוש מאת אמיר שאול." />
     <meta property="og:url" content="https://www.amirshaul.online/" />
     <meta property="og:type" content="website" />
 
+    <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -22,90 +25,130 @@
       "alternateName": "Amir Shaul",
       "url": "https://www.amirshaul.online",
       "jobTitle": "System Administrator, Web Designer & SEO Specialist",
-      "description": "מומחה מחשוב, ניהול תשתיות IT, עיצוב ופיתוח אתרים, וקידום אתרים במנועי חיפוש.",
-      "knowsAbout": [
-        "System Administration",
-        "Web Design",
-        "SEO",
-        "IT Infrastructure",
-        "React"
-      ],
+      "knowsAbout": ["System Administration", "Web Design", "SEO", "IT Infrastructure"],
       "sameAs": [
         "https://www.linkedin.com/in/amir-shaul/",
-        "https://github.com/AmirShaul"
+        "https://github.com/amirshaul"
       ]
     }
     </script>
 
+    <!-- Tailwind Play CDN - טעינה אולטרה-מהירה -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brandDark: '#020617',
+              brandCyan: '#06b6d4'
+            }
+          }
+        }
+      }
+    </script>
     <style>
       body {
-        margin: 0;
         background-color: #020617;
-        color: #ffffff;
+        color: #f8fafc;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      }
-      .ssr-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 96px 24px;
-      }
-      .ssr-tag {
-        display: inline-block;
-        padding: 8px 16px;
-        border-radius: 9999px;
-        background: rgba(6, 182, 212, 0.1);
-        border: 1px solid rgba(6, 182, 212, 0.2);
-        color: #22d3ee;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.3em;
-        text-transform: uppercase;
-        margin-bottom: 40px;
-      }
-      .ssr-title {
-        font-size: 72px;
-        font-weight: 900;
-        line-height: 0.85;
-        letter-spacing: -0.05em;
-        text-transform: uppercase;
-        margin: 0 0 24px 0;
-        font-style: italic;
-      }
-      .ssr-sub {
-        color: #94a3b8;
-        font-style: normal;
-      }
-      .ssr-role {
-        color: #22d3ee;
-        font-family: monospace;
-        font-size: 16px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 16px;
-      }
-      .ssr-quote {
-        color: #cbd5e1;
-        font-size: 20px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin: 0;
       }
     </style>
   </head>
-  <body>
-    <div id="root">
-      <!-- שלד HTML סטטי שמוצג מיידית למשתמש לפני טעינת ה-JavaScript -->
-      <div class="ssr-placeholder">
-        <div class="ssr-tag">IT SYSTEM ENGINEER</div>
-        <h1 class="ssr-title">Amir.<br /><span class="ssr-sub">Shaul</span></h1>
-        <p class="ssr-role">SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO</p>
-        <p class="ssr-quote">"System & Web Architect."</p>
+  <body class="bg-brandDark min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
+
+    <!-- רקע גרדיאנט קל משקל -->
+    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),transparent_70%)]"></div>
+
+    <!-- כפתור יצירת קשר עליון -->
+    <header class="w-full p-6 flex justify-between items-center relative z-20 max-w-6xl mx-auto">
+      <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
+         class="px-5 py-2.5 rounded-full flex items-center space-x-2 space-x-reverse bg-slate-900/80 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-widest uppercase transition-all duration-200 hover:bg-cyan-500 hover:text-black">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <span>צור קשר / Contact</span>
+      </a>
+
+      <div class="flex items-center space-x-4 space-x-reverse text-slate-400">
+        <a href="https://github.com/amirshaul" target="_blank" rel="noreferrer" class="hover:text-cyan-400 transition-colors" aria-label="GitHub">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/amir-shaul/" target="_blank" rel="noreferrer" class="hover:text-cyan-400 transition-colors" aria-label="LinkedIn">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+        </a>
       </div>
-    </div>
-    <script type="module" src="/src/main.jsx"></script>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-5xl mx-auto px-6 py-12 flex flex-col items-center text-center relative z-10">
+
+      <!-- Status Tag -->
+      <div class="inline-flex items-center space-x-2 space-x-reverse px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[11px] font-mono tracking-widest text-cyan-400 uppercase mb-8">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span>IT SYSTEM ENGINEER</span>
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="text-6xl md:text-8xl font-black tracking-tighter uppercase text-white mb-4 italic">
+        Amir.<span class="text-slate-500 not-italic">Shaul</span>
+      </h1>
+
+      <p class="text-xs md:text-sm font-mono tracking-widest text-cyan-400 uppercase font-semibold mb-4">
+        SYSTEM ADMINISTRATOR | WEB DESIGNER | SEO
+      </p>
+
+      <p class="text-slate-300 text-base md:text-xl max-w-xl mx-auto mb-16 font-light leading-relaxed">
+        ארכיטקטורת מערכות IT, ניהול תשתיות ענן, עיצוב ופיתוח פתרונות Web מתקדמים.
+      </p>
+
+      <!-- Projects Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right">
+        
+        <!-- Card 1 -->
+        <a href="https://lab.amirshaul.online" target="_blank" rel="noreferrer" 
+           class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">01 / Instance</span>
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white mb-2">Lab Instance</h2>
+            <p class="text-slate-400 text-xs leading-relaxed">סביבת ניסויים ופיתוח ממשקים מודרניים.</p>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
+           class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">02 / Contact</span>
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white mb-2">Secure Form</h2>
+            <p class="text-slate-400 text-xs leading-relaxed">מערכת יצירת קשר מאובטחת ומסוננת.</p>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a href="https://amirshaul.online" target="_blank" rel="noreferrer" 
+           class="group p-8 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col justify-between h-56">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-mono text-cyan-400 tracking-wider uppercase">03 / Core</span>
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white mb-2">Core System</h2>
+            <p class="text-slate-400 text-xs leading-relaxed">תשתית שרתים, דומיינים וניתוב מהיר.</p>
+          </div>
+        </a>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-8 border-t border-white/5 relative z-10 text-[11px] font-mono tracking-widest text-slate-500 uppercase">
+      © 2026 AMIRSHAUL.ONLINE | ALL SYSTEMS NOMINAL
+    </footer>
+
   </body>
 </html>
