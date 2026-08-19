@@ -55,104 +55,163 @@
     }
     </script>
 
-    <!-- Google Fonts Optimized -->
+    <!-- Google Fonts with display=swap to prevent Layout Shifts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
-    <!-- Tailwind Play CDN (Non-blocking) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Assistant', 'sans-serif'],
-              mono: ['"JetBrains Mono"', 'monospace']
-            }
-          }
-        }
-      }
-    </script>
+    <!-- Pure Inlined Utility CSS (Zero Render-Blocking Requests) -->
     <style>
-      body {
-        font-family: 'Assistant', sans-serif;
+      *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid #e2e8f0; }
+      html { line-height: 1.5; -webkit-text-size-adjust: 100%; tab-size: 4; font-family: 'Assistant', sans-serif; }
+      body { background-color: #020617; color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow-x: hidden; }
+      
+      .font-mono { font-family: 'JetBrains Mono', monospace; }
+      .font-sans { font-family: 'Assistant', sans-serif; }
+
+      /* Progress Bar GPU */
+      #scroll-progress { position: fixed; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(to left, #22d3ee, #3b82f6); z-index: 50; transform-origin: right; transform: scaleX(0); will-change: transform; }
+      .glow-bg { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.1), transparent 60%); }
+
+      /* Layout & Utility */
+      .max-w-5xl { max-width: 64rem; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .p-6 { padding: 1.5rem; }
+      .py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+      .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+      .flex { display: flex; }
+      .flex-col { flex-direction: column; }
+      .items-center { align-items: center; }
+      .justify-between { justify-content: space-between; }
+      .gap-10 { gap: 2.5rem; }
+      .gap-4 { gap: 1rem; }
+      .gap-3 { gap: 0.75rem; }
+      .gap-2 { gap: 0.5rem; }
+      .gap-1 { gap: 0.25rem; }
+      .space-y-24 > :not([hidden]) ~ :not([hidden]) { margin-top: 6rem; }
+      .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+      .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+      .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.625rem; }
+      .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+      
+      .grid { display: grid; }
+      .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      @media (min-width: 640px) {
+        .sm\:flex-row { flex-direction: row; }
+        .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .sm\:justify-between { justify-content: space-between; }
+        .sm\:items-center { align-items: center; }
       }
-      #scroll-progress {
-        transform-origin: right;
-        transform: scaleX(0);
-        will-change: transform;
+      @media (min-width: 768px) {
+        .md\:flex-row { flex-direction: row; }
+        .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .md\:p-12 { padding: 3rem; }
       }
+
+      /* Card & Visual Elements */
+      .card-bg { background-color: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 1rem; }
+      .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.875rem; border-radius: 9999px; background-color: #0f172a; border: 1px solid #1e293b; font-size: 0.75rem; color: #06b6d4; }
+      .pulse-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background-color: #06b6d4; }
+      .tag { padding: 0.25rem 0.75rem; background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #e2e8f0; }
+
+      /* Buttons & Links */
+      .btn-cyan { display: block; width: 100%; padding: 0.75rem; background-color: #06b6d4; color: #000; text-align: center; font-weight: 700; border-radius: 0.75rem; text-decoration: none; transition: background-color 0.2s; }
+      .btn-cyan:hover { background-color: #22d3ee; }
+      .btn-pill-cyan { padding: 0.5rem 1rem; border-radius: 9999px; background-color: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3); color: #06b6d4; font-weight: 700; text-decoration: none; transition: all 0.2s; }
+      .btn-pill-cyan:hover { background-color: #06b6d4; color: #000; }
+      .btn-cta { padding: 0.875rem 2rem; background-color: #06b6d4; color: #000; font-weight: 700; border-radius: 9999px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s; box-shadow: 0 0 20px rgba(6,182,212,0.3); }
+      .btn-cta:hover { background-color: #22d3ee; }
+      .btn-sec { padding: 0.875rem 2rem; background-color: #1e293b; color: #fff; font-weight: 700; border-radius: 9999px; text-decoration: none; border: 1px solid #334155; display: inline-flex; align-items: center; gap: 0.5rem; }
+      .btn-sec:hover { background-color: #334155; }
+
+      /* Text Colors */
+      .text-white { color: #ffffff; }
+      .text-slate-200 { color: #e2e8f0; }
+      .text-slate-300 { color: #cbd5e1; }
+      .text-slate-400 { color: #94a3b8; }
+      .text-cyan-400 { color: #22d3ee; }
+      .text-emerald-400 { color: #34d399; }
+      .text-xs { font-size: 0.75rem; }
+      .text-sm { font-size: 0.875rem; }
+      .text-base { font-size: 1rem; }
+      .text-lg { font-size: 1.125rem; }
+      .text-xl { font-size: 1.25rem; }
+      .text-2xl { font-size: 1.5rem; }
+      .text-5xl { font-size: 3rem; }
+      .font-bold { font-weight: 700; }
+      .font-black { font-weight: 900; }
+      .text-center { text-align: center; }
+      .text-right { text-align: right; }
     </style>
   </head>
-  <body class="bg-[#020617] text-slate-100 min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
+  <body>
 
-    <!-- Accelerated Scroll Progress Bar (GPU Composite) -->
-    <div id="scroll-progress" class="fixed top-0 right-0 left-0 h-[3px] bg-gradient-to-l from-cyan-400 to-blue-500 z-50 transition-transform duration-75 w-full"></div>
+    <!-- Accelerated Scroll Progress Bar -->
+    <div id="scroll-progress" aria-hidden="true"></div>
 
-    <!-- Ambient Grid & Glow -->
-    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_rgba(6,182,212,0.1),transparent_60%)]"></div>
+    <!-- Ambient Glow -->
+    <div class="glow-bg"></div>
 
     <!-- Header Navigation -->
-    <header class="w-full max-w-5xl mx-auto p-6 flex justify-between items-center relative z-20">
-      <div class="flex items-center space-x-3 space-x-reverse">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-black font-black font-mono text-sm shadow-md shadow-cyan-500/20">
+    <header class="w-full max-w-5xl mx-auto p-6 flex justify-between items-center" style="position:relative; z-index:20;">
+      <div class="flex items-center gap-3">
+        <div style="width:2.25rem; height:2.25rem; border-radius:0.75rem; background:linear-gradient(to top right, #06b6d4, #3b82f6); display:flex; align-items:center; justify-content:center; color:#000; font-weight:900; font-size:0.875rem;">
           AS
         </div>
-        <span class="font-mono text-xs text-slate-300 tracking-wider">AMIR.SHAUL // IT_SYS_ENGINEER</span>
+        <span class="font-mono text-xs text-slate-300" style="letter-spacing:0.05em;">AMIR.SHAUL // IT_SYS_ENGINEER</span>
       </div>
 
-      <nav aria-label="Main Navigation" class="flex items-center space-x-4 space-x-reverse font-mono text-xs">
-        <a href="https://www.linkedin.com/in/amir-shaul/" target="_blank" rel="noreferrer" aria-label="פרופיל לינקדאין של אמיר שאול" class="text-slate-300 hover:text-cyan-400 transition-colors flex items-center space-x-1.5 space-x-reverse">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+      <nav aria-label="Main Navigation" class="flex items-center gap-4 font-mono text-xs">
+        <a href="https://www.linkedin.com/in/amir-shaul/" target="_blank" rel="noreferrer" aria-label="פרופיל לינקדאין של אמיר שאול" class="text-slate-300 flex items-center gap-1.5" style="text-decoration:none;">
+          <svg style="width:1rem; height:1rem; fill:currentColor;" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
           <span>LinkedIn</span>
         </a>
-        <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
-           class="px-4 py-2 rounded-full bg-cyan-500/10 hover:bg-cyan-500 hover:text-black border border-cyan-500/30 text-cyan-400 font-bold transition-all shadow-sm">
+        <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="btn-pill-cyan">
           יצירת קשר / Contact
         </a>
       </nav>
     </header>
 
     <!-- Main Container -->
-    <main class="w-full max-w-5xl mx-auto px-6 py-10 flex flex-col relative z-10 space-y-24">
+    <main class="w-full max-w-5xl mx-auto px-6 py-10 flex flex-col space-y-24" style="position:relative; z-index:10;">
 
       <!-- Hero Section -->
       <section class="flex flex-col md:flex-row items-center justify-between gap-10">
-        <div class="space-y-6 text-right max-w-2xl">
+        <div class="space-y-6 text-right" style="max-width:42rem;">
           
-          <div class="inline-flex items-center space-x-2 space-x-reverse px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-400">
-            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <div class="badge font-mono">
+            <span class="pulse-dot"></span>
             <span>IT SYSTEM ADMINISTRATOR & NETWORK SPECIALIST</span>
           </div>
 
-          <h1 class="text-5xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-none">
-            אמיר שאול <span class="text-slate-400 font-light block text-3xl sm:text-4xl mt-2 font-mono">Amir Shaul</span>
+          <h1 class="text-5xl font-black text-white" style="line-height:1.1;">
+            אמיר שאול <span class="text-slate-400 font-mono" style="display:block; font-size:2rem; margin-top:0.5rem; font-weight:300;">Amir Shaul</span>
           </h1>
 
-          <p class="text-slate-200 text-base md:text-lg leading-relaxed font-light">
+          <p class="text-slate-200 text-lg font-sans" style="line-height:1.7; font-weight:300;">
             <strong>מהנדס סיסטם (IT System Engineer) ומנהל רשתות</strong> בעל ניסיון רב בהקמה, ניהול ותחזוקת תשתיות IT ארגוניות מורכבות. התמחות מעמיקה בתשתיות ענן <strong>AWS</strong>, סביבות <strong>Microsoft 365</strong>, ניהול זהויות והרשאות ב-<strong>Entra ID & Active Directory</strong>, שרתי Exchange ו-Terminal Servers (RDS), לצד פתרונות אבטחת מידע ואוטומציית סקריפטים.
           </p>
 
-          <!-- Core Skill Badges & Location -->
-          <div class="flex flex-wrap gap-2 pt-2 text-xs font-mono">
-            <span class="px-3 py-1 bg-slate-900 border border-white/10 rounded-lg text-slate-200">📍 אזור מרכז, תל אביב וחולון (Hybrid / On-site)</span>
-            <span class="px-3 py-1 bg-slate-900 border border-white/10 rounded-lg text-slate-200">☁️ ענן AWS & Microsoft 365</span>
-            <span class="px-3 py-1 bg-slate-900 border border-white/10 rounded-lg text-slate-200">🔑 Entra ID & Active Directory</span>
-            <span class="px-3 py-1 bg-slate-900 border border-white/10 rounded-lg text-slate-200">🖥️ שרתי Terminal וניהול רשתות</span>
-            <span class="px-3 py-1 bg-slate-900 border border-white/10 rounded-lg text-slate-200">🛡️ תמיכת IT ואבטחת מידע</span>
-            <span class="px-3 py-1 bg-slate-900 border border-white/10 rounded-lg text-slate-200">🤖 AI Workflows & Scripting</span>
+          <!-- Core Skill Badges -->
+          <div class="flex gap-2 font-mono text-xs" style="flex-wrap:wrap; padding-top:0.5rem;">
+            <span class="tag">📍 אזור מרכז, תל אביב וחולון (Hybrid / On-site)</span>
+            <span class="tag">☁️ ענן AWS & Microsoft 365</span>
+            <span class="tag">🔑 Entra ID & Active Directory</span>
+            <span class="tag">🖥️ שרתי Terminal וניהול רשתות</span>
+            <span class="tag">🛡️ תמיכת IT ואבטחת מידע</span>
+            <span class="tag">🤖 AI Workflows & Scripting</span>
           </div>
         </div>
 
         <!-- Terminal Status Card -->
-        <aside aria-label="System Profile Status" class="w-full max-w-sm rounded-3xl bg-slate-900/80 border border-slate-800 p-6 shadow-2xl space-y-4">
-          <div class="flex items-center space-x-2 space-x-reverse font-mono text-xs text-slate-400 pb-3 border-b border-slate-800">
-            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-            <span class="mr-2">sysadmin_profile.env</span>
+        <aside aria-label="System Profile Status" class="card-bg p-6 space-y-4" style="width:100%; max-width:24rem; min-height:280px;">
+          <div class="flex items-center gap-2 font-mono text-xs text-slate-400" style="padding-bottom:0.75rem; border-bottom:1px solid #1e293b;">
+            <span style="width:0.75rem; height:0.75rem; border-radius:50%; background:#f43f5e;"></span>
+            <span style="width:0.75rem; height:0.75rem; border-radius:50%; background:#f59e0b;"></span>
+            <span style="width:0.75rem; height:0.75rem; border-radius:50%; background:#10b981;"></span>
+            <span style="margin-right:0.5rem;">sysadmin_profile.env</span>
           </div>
           <div class="font-mono text-xs space-y-2 text-slate-200">
             <p><span class="text-cyan-400">amir@shaul:~$</span> status --verbose</p>
@@ -162,7 +221,7 @@
             <p><span class="text-slate-400">Availability:</span> On-site / Hybrid Opportunities</p>
             <p><span class="text-slate-400">Expertise:</span> Cloud / Identity / Infrastructure</p>
           </div>
-          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="block w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black text-center font-mono font-bold text-xs rounded-xl transition-all shadow-md">
+          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="btn-cyan font-mono text-xs">
             SEND MESSAGE // צור קשר
           </a>
         </aside>
@@ -170,110 +229,105 @@
 
       <!-- Technical Domains Grid -->
       <section class="space-y-6">
-        <div class="flex justify-between items-end border-b border-slate-800 pb-3 font-mono text-xs">
-          <h2 class="text-cyan-400 font-bold uppercase text-xs">// CORE IT & SYSTEM COMPETENCIES</h2>
-          <span class="text-slate-400">תחומי התמחות בסיסטם</span>
+        <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.75rem;">
+          <h2 class="text-cyan-400 font-bold font-mono text-xs">// CORE IT & SYSTEM COMPETENCIES</h2>
+          <span class="text-slate-400 font-mono text-xs">תחומי התמחות בסיסטם</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 font-mono text-xs">
-          <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
-            <span class="text-cyan-400 text-[10px] block">01 / CLOUD & IDENTITY</span>
+          <div class="card-bg p-6 space-y-2">
+            <span class="text-cyan-400" style="font-size:0.625rem; display:block;">01 / CLOUD & IDENTITY</span>
             <h3 class="text-sm font-bold text-white">ענן AWS ו-Entra ID</h3>
-            <p class="text-slate-300 font-sans text-xs leading-relaxed">ניהול סביבות ענן היברידיות, Single Sign-On (SSO), אימות רב-שלבי (MFA), והגדרת מדיניות אבטחת מידע וזהויות.</p>
+            <p class="text-slate-300 font-sans text-xs" style="line-height:1.6;">ניהול סביבות ענן היברידיות, Single Sign-On (SSO), אימות רב-שלבי (MFA), והגדרת מדיניות אבטחת מידע וזהויות.</p>
           </div>
 
-          <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
-            <span class="text-cyan-400 text-[10px] block">02 / ENTERPRISE COLLAB</span>
+          <div class="card-bg p-6 space-y-2">
+            <span class="text-cyan-400" style="font-size:0.625rem; display:block;">02 / ENTERPRISE COLLAB</span>
             <h3 class="text-sm font-bold text-white">Microsoft 365 & Exchange</h3>
-            <p class="text-slate-300 font-sans text-xs leading-relaxed">ניהול תיבות דואר ארגוניות, ניתוב דואר ומניעת ספאם, שיתוף יומנים ארגוני, וסביבות Teams & SharePoint.</p>
+            <p class="text-slate-300 font-sans text-xs" style="line-height:1.6;">ניהול תיבות דואר ארגוניות, ניתוב דואר ומניעת ספאם, שיתוף יומנים ארגוני, וסביבות Teams & SharePoint.</p>
           </div>
 
-          <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
-            <span class="text-cyan-400 text-[10px] block">03 / REMOTE ACCESS</span>
+          <div class="card-bg p-6 space-y-2">
+            <span class="text-cyan-400" style="font-size:0.625rem; display:block;">03 / REMOTE ACCESS</span>
             <h3 class="text-sm font-bold text-white">שרתי Terminal ו-RDS</h3>
-            <p class="text-slate-300 font-sans text-xs leading-relaxed">הקמה ותחזוקת שרתי Terminal ו-RDS, ניהול גישה מרחוק מאובטחת, חלוקת משאבים ופרופילי משתמשים בארגון.</p>
+            <p class="text-slate-300 font-sans text-xs" style="line-height:1.6;">הקמה ותחזוקת שרתי Terminal ו-RDS, ניהול גישה מרחוק מאובטחת, חלוקת משאבים ופרופילי משתמשים בארגון.</p>
           </div>
 
-          <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
-            <span class="text-cyan-400 text-[10px] block">04 / AUTOMATION</span>
+          <div class="card-bg p-6 space-y-2">
+            <span class="text-cyan-400" style="font-size:0.625rem; display:block;">04 / AUTOMATION</span>
             <h3 class="text-sm font-bold text-white">אוטומציה וסקריפטים</h3>
-            <p class="text-slate-300 font-sans text-xs leading-relaxed">אוטומציית משימות שגרתיות וסיסטם באמצעות סקריפטים, שילוב כלי AI לייעול תהליכי עבודה ותמיכת IT מהירה.</p>
+            <p class="text-slate-300 font-sans text-xs" style="line-height:1.6;">אוטומציית משימות שגרתיות וסיסטם באמצעות סקריפטים, שילוב כלי AI לייעול תהליכי עבודה ותמיכת IT מהירה.</p>
           </div>
 
-          <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
-            <span class="text-cyan-400 text-[10px] block">05 / DIRECTORY & POLICIES</span>
+          <div class="card-bg p-6 space-y-2">
+            <span class="text-cyan-400" style="font-size:0.625rem; display:block;">05 / DIRECTORY & POLICIES</span>
             <h3 class="text-sm font-bold text-white">Active Directory & רשתות</h3>
-            <p class="text-slate-300 font-sans text-xs leading-relaxed">ניהול Forest/Domain, הגדרות Group Policy (GPO) קפדניות, הרשאות קבצים (NTFS), ותשתיות DNS/DHCP.</p>
+            <p class="text-slate-300 font-sans text-xs" style="line-height:1.6;">ניהול Forest/Domain, הגדרות Group Policy (GPO) קפדניות, הרשאות קבצים (NTFS), ותשתיות DNS/DHCP.</p>
           </div>
 
-          <div class="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
-            <span class="text-cyan-400 text-[10px] block">06 / ENTERPRISE ERP</span>
+          <div class="card-bg p-6 space-y-2">
+            <span class="text-cyan-400" style="font-size:0.625rem; display:block;">06 / ENTERPRISE ERP</span>
             <h3 class="text-sm font-bold text-white">ניהול מערכות SAP</h3>
-            <p class="text-slate-300 font-sans text-xs leading-relaxed">ניהול הרשאות ותחזוקת סביבות SAP מורכבות, טיפול במשתמשים ותמיכה בתהליכים תפעוליים בארגונים גדולים.</p>
+            <p class="text-slate-300 font-sans text-xs" style="line-height:1.6;">ניהול הרשאות ותחזוקת סביבות SAP מורכבות, טיפול במשתמשים ותמיכה בתהליכים תפעוליים בארגונים גדולים.</p>
           </div>
         </div>
       </section>
 
       <!-- Professional Experience -->
       <section class="space-y-6">
-        <div class="flex justify-between items-end border-b border-slate-800 pb-3 font-mono text-xs">
-          <h2 class="text-cyan-400 font-bold uppercase text-xs">// PROFESSIONAL EXPERIENCE</h2>
-          <span class="text-slate-400">ניסיון תעסוקתי</span>
+        <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.75rem;">
+          <h2 class="text-cyan-400 font-bold font-mono text-xs">// PROFESSIONAL EXPERIENCE</h2>
+          <span class="text-slate-400 font-mono text-xs">ניסיון תעסוקתי</span>
         </div>
 
         <div class="space-y-4">
-          
-          <!-- Kali Group -->
-          <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2.5">
+          <div class="card-bg p-6 space-y-2.5">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-              <h3 class="text-lg font-bold text-white">System Administrator <span class="text-cyan-400 font-normal">@ קבוצת קלי (Kali Group)</span></h3>
+              <h3 class="text-lg font-bold text-white">System Administrator <span class="text-cyan-400" style="font-weight:400;">@ קבוצת קלי (Kali Group)</span></h3>
               <span class="font-mono text-xs text-slate-300">יולי 2025 - נוכחי</span>
             </div>
-            <p class="text-xs text-slate-200 leading-relaxed font-sans">
+            <p class="text-xs text-slate-200 font-sans" style="line-height:1.6;">
               ניהול תשתיות המחשוב והתקשורת הארגוניות של הקבוצה. הובלת תהליכי תצורה וניהול שוטף בסביבות Microsoft 365 ו-Entra ID, ניהול שרתי Exchange ו-Terminal Servers, הגדרת הרשאות משתמשים ומדיניות אבטחת מידע, ניטור שרתים שוטף, ואוטומציית משימות סיסטם לייעול התפעול.
             </p>
           </div>
 
-          <!-- Matrix -->
-          <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2.5">
+          <div class="card-bg p-6 space-y-2.5">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-              <h3 class="text-lg font-bold text-white">IT Specialist & System Support <span class="text-cyan-400 font-normal">@ Matrix</span></h3>
+              <h3 class="text-lg font-bold text-white">IT Specialist & System Support <span class="text-cyan-400" style="font-weight:400;">@ Matrix</span></h3>
               <span class="font-mono text-xs text-slate-300">מרץ 2024 - יולי 2025</span>
             </div>
-            <p class="text-xs text-slate-200 leading-relaxed font-sans">
+            <p class="text-xs text-slate-200 font-sans" style="line-height:1.6;">
               מתן פתרונות מחשוב וסיסטם מתקדמים, ליווי ותחזוקת סביבות עבודה מרחוק (Remote Workspaces), פתרון תקלות תשתית מורכבות ברמת השרתים ותחנות הקצה, ותמיכה בטכנולוגיות רשת מתקדמות.
             </p>
           </div>
 
-          <!-- IDF -->
-          <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2.5">
+          <div class="card-bg p-6 space-y-2.5">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-              <h3 class="text-lg font-bold text-white">System Administrator & SAP Manager <span class="text-cyan-400 font-normal">@ צה"ל (IDF)</span></h3>
+              <h3 class="text-lg font-bold text-white">System Administrator & SAP Manager <span class="text-cyan-400" style="font-weight:400;">@ צה"ל (IDF)</span></h3>
               <span class="font-mono text-xs text-slate-300">מרץ 2020 - נובמבר 2022</span>
             </div>
-            <p class="text-xs text-slate-200 leading-relaxed font-sans">
+            <p class="text-xs text-slate-200 font-sans" style="line-height:1.6;">
               שירות צבאי מלא כמנהל מערכות מידע ומנהל מערכות SAP. ניהול משתמשים והרשאות ב-Active Directory, טיפול שוטף בתשתיות סיסטם ורשתות, ותמיכה במערכות קריטיות בתנאי שטח ומבצעיות.
             </p>
           </div>
-
         </div>
       </section>
 
       <!-- Education & Credentials -->
       <section class="space-y-6">
-        <div class="flex justify-between items-end border-b border-slate-800 pb-3 font-mono text-xs">
-          <h2 class="text-cyan-400 font-bold uppercase text-xs">// EDUCATION & QUALIFICATIONS</h2>
-          <span class="text-slate-400">השכלה והסמכות</span>
+        <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.75rem;">
+          <h2 class="text-cyan-400 font-bold font-mono text-xs">// EDUCATION & QUALIFICATIONS</h2>
+          <span class="text-slate-400 font-mono text-xs">השכלה והסמכות</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
+          <div class="card-bg p-6 space-y-2">
             <div class="text-cyan-400 font-mono text-xs">ספט׳ 2022 - מרץ 2024</div>
             <h3 class="text-base font-bold text-white">הנדסאי תוכנה ופיתוח Full Stack (Engineer's Degree)</h3>
             <p class="text-xs text-slate-300 font-sans">מכללות אורט (ORT Colleges)</p>
           </div>
 
-          <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-2">
+          <div class="card-bg p-6 space-y-2">
             <div class="text-cyan-400 font-mono text-xs">ספט׳ 2013 - יוני 2019</div>
             <h3 class="text-base font-bold text-white">תעודת בגרות מלאה (High School Diploma)</h3>
             <p class="text-xs text-slate-300 font-sans">תיכון הרצוג חולון (Hertzog Holon)</p>
@@ -282,21 +336,19 @@
       </section>
 
       <!-- CTA Contact Box -->
-      <section class="p-8 md:p-12 rounded-3xl bg-gradient-to-r from-slate-900 to-slate-950 border border-cyan-500/30 flex flex-col items-center text-center space-y-6 shadow-xl">
-        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+      <section class="p-6 md:p-12 card-bg flex flex-col items-center text-center space-y-6" style="background:linear-gradient(to right, #0f172a, #020617); border-color:rgba(6,182,212,0.3);">
+        <h2 class="text-2xl font-black text-white">
           מעוניינים בחיזוק מערך ה-IT והסיסטם בארגון?
         </h2>
-        <p class="text-slate-300 text-xs sm:text-sm max-w-lg leading-relaxed font-sans">
+        <p class="text-slate-300 text-xs sm:text-sm font-sans" style="max-width:32rem; line-height:1.7;">
           זמין להובלת תשתיות IT, ענן וניהול רשתות באזור המרכז ותל אביב (היברידי או On-site). מוזמנים להשאיר פנייה ישירה או להתחבר בלינקדאין.
         </p>
         <div class="flex flex-col sm:flex-row items-center gap-3">
-          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" 
-             class="px-8 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-mono font-bold text-xs rounded-full uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="btn-cta font-mono text-xs">
             יצירת קשר / Contact Form
           </a>
-          <a href="https://www.linkedin.com/in/amir-shaul/" target="_blank" rel="noreferrer" 
-             class="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-mono font-bold text-xs rounded-full uppercase tracking-widest transition-all border border-slate-700 flex items-center space-x-2 space-x-reverse">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+          <a href="https://www.linkedin.com/in/amir-shaul/" target="_blank" rel="noreferrer" class="btn-sec font-mono text-xs">
+            <svg style="width:1rem; height:1rem; fill:currentColor;" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
             <span>פרופיל LinkedIn</span>
           </a>
         </div>
@@ -305,7 +357,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full text-center py-8 border-t border-slate-900 text-xs font-mono text-slate-400">
+    <footer class="w-full text-center py-8 text-xs font-mono text-slate-400" style="border-top:1px solid #0f172a;">
       © 2026 AMIR SHAUL | IT SYSTEM ENGINEER & INFRASTRUCTURE | ALL SYSTEMS OPERATIONAL
     </footer>
 
