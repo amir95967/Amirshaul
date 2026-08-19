@@ -1,0 +1,20 @@
+# Amir Shaul - IT System Engineer & Infrastructure
+> Official Portfolio & Professional Profile: https://www.amirshaul.online/
+
+## About
+Amir Shaul is a professional IT System Engineer and System Administrator based in Holon / Tel Aviv, Israel. He specializes in enterprise IT infrastructure, AWS Cloud environments, Microsoft 365, Microsoft Entra ID (Azure AD), Active Directory, Exchange Servers, Terminal Servers (RDS), and Cybersecurity.
+
+## Current Role
+- **Company:** Kali Group (קבוצת קלי)
+- **Position:** IT System Administrator & Engineer (Since July 2025)
+
+## Professional Expertise
+- **Cloud & Identity:** AWS Cloud Infrastructure, Microsoft Entra ID, Single Sign-On (SSO), MFA, Identity & Access Management (IAM).
+- **Enterprise Messaging:** Microsoft 365, Exchange Server Administration, Hybrid Deployments.
+- **Directory & Virtualization:** Active Directory, Group Policy (GPO), Terminal Servers / Remote Desktop Services (RDS).
+- **Automation & Security:** PowerShell scripting, AI-driven IT workflows, Endpoint Security, Network Administration.
+
+## Contact & Links
+- **Website:** https://www.amirshaul.online/
+- **LinkedIn:** https://www.linkedin.com/in/amir-shaul/
+- **Contact Form:** https://form.amirshaul.online/
