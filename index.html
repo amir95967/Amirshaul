@@ -161,39 +161,62 @@
       }
 
       /* Card & Visual Elements */
-      .card-bg { background-color: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 1rem; }
+      .card-bg { background-color: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 1.25rem; }
       .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.875rem; border-radius: 9999px; background-color: #0f172a; border: 1px solid #1e293b; font-size: 0.75rem; color: #06b6d4; }
       .pulse-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background-color: #06b6d4; }
       .tag { padding: 0.25rem 0.75rem; background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #e2e8f0; }
 
-      /* Profile Image Styles */
+      /* Premium Glowing Avatar Frame */
+      .profile-img-container {
+        position: relative;
+        width: 6rem;
+        height: 6rem;
+        flex-shrink: 0;
+      }
+      .profile-img-glow {
+        position: absolute;
+        inset: -3px;
+        background: linear-gradient(135deg, #06b6d4, #3b82f6, #06b6d4);
+        border-radius: 1.25rem;
+        filter: blur(8px);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
       .profile-img-wrap {
         position: relative;
-        width: 4.5rem;
-        height: 4.5rem;
-        border-radius: 1rem;
-        padding: 2px;
-        background: linear-gradient(135deg, #06b6d4, #3b82f6);
-        box-shadow: 0 4px 16px rgba(6,182,212,0.25);
-        flex-shrink: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 1.25rem;
+        padding: 3px;
+        background: linear-gradient(135deg, #22d3ee, #1e40af);
+        box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
+      }
+      .profile-img-container:hover .profile-img-glow {
+        opacity: 1;
       }
       .profile-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 0.875rem;
+        border-radius: 1.1rem;
         display: block;
         background-color: #1e293b;
+        transition: transform 0.3s ease;
+      }
+      .profile-img-container:hover .profile-img {
+        transform: scale(1.03);
       }
       .online-dot {
         position: absolute;
-        bottom: -2px;
-        left: -2px;
-        width: 0.875rem;
-        height: 0.875rem;
+        bottom: -3px;
+        left: -3px;
+        width: 1.1rem;
+        height: 1.1rem;
         background-color: #10b981;
-        border: 2px solid #0f172a;
+        border: 2.5px solid #0f172a;
         border-radius: 50%;
+        box-shadow: 0 0 10px #10b981;
+        z-index: 2;
       }
 
       /* Buttons & Links */
@@ -366,7 +389,7 @@
     <!-- Main Container -->
     <main class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col space-y-24" style="position:relative; z-index:10;">
 
-      <!-- Hero Section with Profile Picture and Terminal Card -->
+      <!-- Hero Section with Glowing Profile Avatar & Status Card -->
       <section class="flex flex-col md:flex-row items-center justify-between gap-10">
         <div class="space-y-6 text-right" style="max-width:42rem;">
           
@@ -395,8 +418,8 @@
           </div>
         </div>
 
-        <!-- Terminal Status Card with Profile Picture -->
-        <aside aria-label="System Profile Status" class="card-bg p-6 space-y-4" style="width:100%; max-width:24rem;">
+        <!-- Terminal Status Card with Enhanced Glowing Avatar -->
+        <aside aria-label="System Profile Status" class="card-bg p-6 space-y-5" style="width:100%; max-width:24rem;">
           <div class="flex items-center justify-between font-mono text-xs text-slate-400" style="padding-bottom:0.75rem; border-bottom:1px solid #1e293b;">
             <div class="flex items-center gap-2">
               <span style="width:0.75rem; height:0.75rem; border-radius:50%; background:#f43f5e;"></span>
@@ -406,16 +429,22 @@
             <span>sysadmin_profile.env</span>
           </div>
 
-          <!-- Profile Picture & Status Header -->
+          <!-- Glowing Avatar + User Info -->
           <div class="flex items-center gap-4">
-            <div class="profile-img-wrap">
-              <img src="/amir.jpg" alt="אמיר שאול - Amir Shaul" width="72" height="72" class="profile-img" />
-              <span class="online-dot" title="Active"></span>
+            <div class="profile-img-container">
+              <div class="profile-img-glow"></div>
+              <div class="profile-img-wrap">
+                <img src="/amir.jpg" alt="אמיר שאול - Amir Shaul" width="96" height="96" class="profile-img" />
+                <span class="online-dot" title="Active"></span>
+              </div>
             </div>
-            <div class="space-y-1">
-              <h2 class="text-base font-bold text-white leading-tight">אמיר שאול</h2>
-              <p class="font-mono text-xs text-cyan-400">IT System Engineer</p>
-              <p class="font-mono text-[10px] text-emerald-400">● Available for Projects</p>
+            <div class="space-y-1.5">
+              <h2 class="text-lg font-bold text-white leading-tight">אמיר שאול</h2>
+              <p class="font-mono text-xs text-cyan-400 font-semibold">IT System Engineer</p>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/30 text-[11px] font-mono text-blue-400 font-bold">
+                <svg style="width:0.85rem; height:0.85rem; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                <span>10,000+ Connections</span>
+              </div>
             </div>
           </div>
 
