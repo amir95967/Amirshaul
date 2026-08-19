@@ -55,7 +55,7 @@
     }
     </script>
 
-    <!-- Zero Latency / Instant System CSS -->
+    <!-- Zero Latency / Pure System CSS -->
     <style>
       *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid #e2e8f0; }
       html { line-height: 1.5; -webkit-text-size-adjust: 100%; tab-size: 4; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -64,9 +64,9 @@
       .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
       .font-sans { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      /* Progress Bar GPU */
+      /* Accelerated Scroll Progress Bar */
       #scroll-progress { position: fixed; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(to left, #22d3ee, #3b82f6); z-index: 50; transform-origin: right; transform: scaleX(0); will-change: transform; }
-      .glow-bg { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.1), transparent 60%); }
+      .glow-bg { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.12), transparent 60%); }
 
       /* Layout */
       .max-w-5xl { max-width: 64rem; }
@@ -105,7 +105,26 @@
         .md\:p-12 { padding: 3rem; }
       }
 
-      /* Clean & Spaced Header Styles */
+      /* Hero Title Typography */
+      .hero-title {
+        font-size: clamp(2.5rem, 8vw, 4.5rem);
+        font-weight: 900;
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+      }
+      .hero-subtitle-gradient {
+        display: block;
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        font-weight: 800;
+        margin-top: 0.35rem;
+        background: linear-gradient(90deg, #22d3ee, #60a5fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 0.02em;
+      }
+
+      /* Header Layout */
       .site-header {
         width: 100%;
         max-width: 64rem;
@@ -197,11 +216,72 @@
       .text-lg { font-size: 1.125rem; }
       .text-xl { font-size: 1.25rem; }
       .text-2xl { font-size: 1.5rem; }
-      .text-5xl { font-size: 3rem; }
       .font-bold { font-weight: 700; }
       .font-black { font-weight: 900; }
       .text-center { text-align: center; }
       .text-right { text-align: right; }
+
+      /* Accessibility Widget Styles */
+      #a11y-trigger {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 1.5rem;
+        z-index: 100;
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: 50%;
+        background-color: #06b6d4;
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        cursor: pointer;
+        border: 2px solid #fff;
+        transition: transform 0.2s;
+      }
+      #a11y-trigger:hover { transform: scale(1.08); }
+      #a11y-panel {
+        position: fixed;
+        bottom: 5.5rem;
+        left: 1.5rem;
+        z-index: 100;
+        width: 18rem;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 1rem;
+        padding: 1.25rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        display: none;
+      }
+      #a11y-panel.open { display: block; }
+      .a11y-btn {
+        width: 100%;
+        padding: 0.6rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0.5rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: right;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #334155;
+      }
+      .a11y-btn:hover { background: #334155; }
+      .a11y-reset { background: #e11d48; color: #fff; border: none; }
+      .a11y-reset:hover { background: #be123c; }
+
+      /* Accessibility Modes */
+      body.a11y-large-font { font-size: 115% !important; }
+      body.a11y-huge-font { font-size: 130% !important; }
+      body.a11y-high-contrast { background-color: #000 !important; color: #fff !important; }
+      body.a11y-high-contrast * { background-color: transparent !important; color: #fff !important; border-color: #fff !important; }
+      body.a11y-readable-font * { font-family: Arial, sans-serif !important; }
+      body.a11y-underline-links a { text-decoration: underline !important; font-weight: bold !important; }
     </style>
   </head>
   <body>
@@ -212,7 +292,7 @@
     <!-- Ambient Glow -->
     <div class="glow-bg"></div>
 
-    <!-- Redesigned Spacious Header Navigation -->
+    <!-- Redesigned Header Navigation -->
     <header class="site-header">
       <div class="brand-group">
         <div style="width:2.5rem; height:2.5rem; border-radius:0.75rem; background:linear-gradient(to top right, #06b6d4, #3b82f6); display:flex; align-items:center; justify-content:center; color:#000; font-weight:900; font-size:0.9rem; box-shadow: 0 4px 12px rgba(6,182,212,0.2);">
@@ -238,7 +318,7 @@
     <!-- Main Container -->
     <main class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col space-y-24" style="position:relative; z-index:10;">
 
-      <!-- Hero Section -->
+      <!-- Hero Section with Iconic Big Typography -->
       <section class="flex flex-col md:flex-row items-center justify-between gap-10">
         <div class="space-y-6 text-right" style="max-width:42rem;">
           
@@ -247,8 +327,9 @@
             <span>IT SYSTEM ADMINISTRATOR & NETWORK SPECIALIST</span>
           </div>
 
-          <h1 class="text-5xl font-black text-white" style="line-height:1.1;">
-            אמיר שאול <span class="text-slate-400 font-mono" style="display:block; font-size:2rem; margin-top:0.5rem; font-weight:300;">Amir Shaul</span>
+          <h1 class="hero-title">
+            אמיר שאול 
+            <span class="hero-subtitle-gradient font-mono">Amir Shaul // SysAdmin</span>
           </h1>
 
           <p class="text-slate-200 text-lg font-sans" style="line-height:1.7; font-weight:300;">
@@ -422,8 +503,47 @@
       © 2026 AMIR SHAUL | IT SYSTEM ENGINEER & INFRASTRUCTURE | ALL SYSTEMS OPERATIONAL
     </footer>
 
-    <!-- Optimized Scroll Progress Script (GPU Transform) -->
+    <!-- Accessibility Floating Trigger Button -->
+    <button id="a11y-trigger" aria-label="תפריט נגישות" title="תפריט נגישות">
+      <svg style="width:1.6rem; height:1.6rem; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/></svg>
+    </button>
+
+    <!-- Accessibility Panel Modal -->
+    <div id="a11y-panel" role="dialog" aria-label="הגדרות נגישות">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #334155; padding-bottom:0.5rem;">
+        <span style="font-weight:bold; font-size:0.9rem; color:#22d3ee;">תפריט נגישות (ת"י 5568)</span>
+        <button id="a11y-close" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;" aria-label="סגור תפריט נגישות">&times;</button>
+      </div>
+
+      <button class="a11y-btn" onclick="toggleA11y('a11y-large-font')">
+        <span>הגדלת טקסט</span>
+        <span>A+</span>
+      </button>
+
+      <button class="a11y-btn" onclick="toggleA11y('a11y-high-contrast')">
+        <span>ניגודיות גבוהה</span>
+        <span>🌓</span>
+      </button>
+
+      <button class="a11y-btn" onclick="toggleA11y('a11y-readable-font')">
+        <span>פונט קריא</span>
+        <span>🔤</span>
+      </button>
+
+      <button class="a11y-btn" onclick="toggleA11y('a11y-underline-links')">
+        <span>הדגשת קישורים</span>
+        <span>🔗</span>
+      </button>
+
+      <button class="a11y-btn a11y-reset" onclick="resetA11y()">
+        <span>איפוס הגדרות</span>
+        <span>🔄</span>
+      </button>
+    </div>
+
+    <!-- Scripts: Scroll Progress & Accessibility Engine -->
     <script>
+      // 1. Scroll Progress GPU Accelerated
       const bar = document.getElementById('scroll-progress');
       let ticking = false;
 
@@ -443,6 +563,39 @@
           ticking = true;
         }
       }, { passive: true });
+
+      // 2. Accessibility Toggle Logic
+      const a11yTrigger = document.getElementById('a11y-trigger');
+      const a11yPanel = document.getElementById('a11y-panel');
+      const a11yClose = document.getElementById('a11y-close');
+
+      a11yTrigger.addEventListener('click', () => {
+        a11yPanel.classList.toggle('open');
+      });
+
+      a11yClose.addEventListener('click', () => {
+        a11yPanel.classList.remove('open');
+      });
+
+      function toggleA11y(className) {
+        document.body.classList.toggle(className);
+        localStorage.setItem(className, document.body.classList.contains(className));
+      }
+
+      function resetA11y() {
+        const classes = ['a11y-large-font', 'a11y-high-contrast', 'a11y-readable-font', 'a11y-underline-links'];
+        classes.forEach(cls => {
+          document.body.classList.remove(cls);
+          localStorage.removeItem(cls);
+        });
+      }
+
+      // Load Saved A11y Settings
+      ['a11y-large-font', 'a11y-high-contrast', 'a11y-readable-font', 'a11y-underline-links'].forEach(cls => {
+        if (localStorage.getItem(cls) === 'true') {
+          document.body.classList.add(cls);
+        }
+      });
     </script>
 
   </body>
