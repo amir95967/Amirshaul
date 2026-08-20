@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Layout, 
@@ -9,6 +10,7 @@ import {
   Mail, 
   Github 
 } from 'lucide-react';
+import KaliDashboard from './KaliDashboard';
 
 const iconsMap = {
   Layout,
@@ -51,13 +53,9 @@ const MY_PROJECTS = [
 
 const ProjectCard = ({ iconName, title, desc, link, gradient }) => (
   <div className="relative group h-[400px] rounded-3xl overflow-hidden border border-white/10 bg-[#020617] transition-transform duration-300 hover:-translate-y-2">
-    {/* רקע גרדיאנט קל משקל */}
     <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-100 transition-opacity duration-300`} />
-    
-    {/* שכבת עומק כהה */}
     <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent" />
 
-    {/* תוכן הכרטיס */}
     <div className="relative h-full p-8 flex flex-col items-center text-center justify-end z-10">
       <div className="w-16 h-16 rounded-2xl bg-cyan-950/60 flex items-center justify-center mb-6 text-cyan-400 border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-black transition-all duration-300">
         <SafeIcon name={iconName} size={32} />
@@ -82,11 +80,11 @@ const ProjectCard = ({ iconName, title, desc, link, gradient }) => (
   </div>
 );
 
-export default function App() {
+function HomePage() {
   return (
     <div className="min-h-screen bg-[#020617] w-full flex flex-col items-center relative overflow-hidden font-sans">
       
-      {/* Background Glows מותאם לביצועים ללא חישובי Blur כבדים */}
+      {/* Background Glows */}
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_rgba(6,182,212,0.15),transparent_60%)]" />
 
       {/* כפתור יצירת קשר מרחף */}
@@ -195,5 +193,19 @@ export default function App() {
       </footer>
 
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* דף הבית */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* הדף הנעול למערכת ה-IT */}
+        <Route path="/kali" element={<KaliDashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
