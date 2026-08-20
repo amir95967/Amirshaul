@@ -1,13 +1,274 @@
 <!doctype html>
-<html lang="he" dir="rtl" class="dark">
+<html lang="he" dir="rtl" class="dark" id="html-root">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Amir Shaul | IT System Engineer</title>
+    
+    <title>אמיר שאול | Amir Shaul - IT System Engineer & מנהל רשתות וסיסטם</title>
+    <meta name="description" content="אמיר שאול (Amir Shaul) - מומחה IT System Engineer, מהנדס סיסטם ומנהל רשתות ותשתיות ענן." />
+    <link rel="canonical" href="https://www.amirshaul.online/" />
+
+    <style>
+      *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid #e2e8f0; }
+      html { line-height: 1.5; -webkit-text-size-adjust: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 16px; scroll-behavior: smooth; }
+      body { background-color: #020617; color: #f1f5f9; min-height: 100vh; position: relative; overflow-x: hidden; }
+      
+      .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+      .font-sans { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+
+      #scroll-progress { position: fixed; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(to left, #22d3ee, #3b82f6); z-index: 50; transform-origin: right; transform: scaleX(0); }
+      .glow-bg { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.12), transparent 60%); }
+
+      .max-w-5xl { max-width: 64rem; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .p-6 { padding: 1.5rem; }
+      .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+      .flex { display: flex; }
+      .flex-col { flex-direction: column; }
+      .items-center { align-items: center; }
+      .justify-between { justify-content: space-between; }
+      .gap-10 { gap: 2.5rem; }
+      .gap-4 { gap: 1rem; }
+      .gap-2 { gap: 0.5rem; }
+      .space-y-20 > :not([hidden]) ~ :not([hidden]) { margin-top: 5rem; }
+      .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+      .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+      .space-y-2 { > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; } }
+      
+      .grid { display: grid; }
+      .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      @media (min-width: 640px) {
+        .sm\:flex-row { flex-direction: row; }
+        .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .sm\:justify-between { justify-content: space-between; }
+      }
+      @media (min-width: 768px) {
+        .md\:flex-row { flex-direction: row; }
+        .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+
+      .hero-title { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900; line-height: 1.1; color: #ffffff; }
+      .hero-subtitle { display: block; font-size: clamp(1.25rem, 4vw, 2.25rem); font-weight: 800; margin-top: 0.35rem; background: linear-gradient(90deg, #22d3ee, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+      .site-header { width: 100%; max-width: 64rem; margin: 0 auto; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 20; }
+      .card-bg { background-color: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 1.25rem; }
+      .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.875rem; border-radius: 9999px; background-color: #0f172a; border: 1px solid #1e293b; font-size: 0.75rem; color: #06b6d4; }
+      .pulse-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background-color: #06b6d4; }
+      .tag { padding: 0.25rem 0.75rem; background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #e2e8f0; font-size: 0.75rem; }
+
+      .profile-img-container { position: relative; width: 5.5rem; height: 5.5rem; shrink-0; }
+      .profile-img { width: 100%; height: 100%; object-fit: cover; border-radius: 1rem; border: 2px solid #06b6d4; }
+
+      .btn-cyan { display: block; width: 100%; padding: 0.75rem; background-color: #06b6d4; color: #000; text-align: center; font-weight: 700; border-radius: 0.75rem; text-decoration: none; }
+      .btn-pill-cyan { padding: 0.5rem 1.25rem; border-radius: 9999px; background-color: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.4); color: #22d3ee; font-weight: 700; text-decoration: none; font-size: 0.8rem; }
+    </style>
   </head>
-  <body class="bg-[#020617] text-slate-100">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+  <body>
+
+    <div id="scroll-progress"></div>
+    <div class="glow-bg"></div>
+
+    <header class="site-header">
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <div style="width:2.25rem; height:2.25rem; border-radius:0.75rem; background:linear-gradient(to top right, #06b6d4, #3b82f6); display:flex; align-items:center; justify-content:center; color:#000; font-weight:900; font-size:0.875rem;">AS</div>
+        <span class="font-mono text-xs" style="color:#94a3b8;">AMIR.SHAUL // SYS_ADMIN</span>
+      </div>
+
+      <nav class="font-mono" style="display:flex; gap:1rem; align-items:center;">
+        <a href="https://www.linkedin.com/in/amir-shaul/" target="_blank" rel="noreferrer" style="color:#cbd5e1; text-decoration:none; font-size:0.8rem;">LinkedIn</a>
+        <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="btn-pill-cyan">יצירת קשר / Contact</a>
+      </nav>
+    </header>
+
+    <main class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col space-y-20" style="position:relative; z-index:10;">
+
+      <!-- Hero Section -->
+      <section class="flex flex-col md:flex-row items-center justify-between gap-10">
+        <div class="space-y-6 text-right" style="max-width:38rem;">
+          <div class="badge font-mono">
+            <span class="pulse-dot"></span>
+            <span>IT SYSTEM ADMINISTRATOR & NETWORK SPECIALIST</span>
+          </div>
+
+          <h1 class="hero-title">
+            אמיר שאול 
+            <span class="hero-subtitle font-mono">Amir Shaul // SysAdmin</span>
+          </h1>
+
+          <p style="color:#cbd5e1; font-size:1.1rem; line-height:1.7;">
+            <strong style="color:#fff;">מהנדס סיסטם (IT System Engineer) ומנהל רשתות</strong> בעל ניסיון רב בהקמה, ניהול ותחזוקת תשתיות IT ארגוניות מורכבות. התמחות מעמיקה בתשתיות ענן <strong style="color:#fff;">AWS</strong>, סביבות <strong style="color:#fff;">Microsoft 365</strong>, ניהול זהויות והרשאות ב-<strong style="color:#fff;">Entra ID & Active Directory</strong>, שרתי Exchange ו-Terminal Servers (RDS).
+          </p>
+
+          <div class="flex gap-2 font-mono" style="flex-wrap:wrap;">
+            <span class="tag">📍 אזור מרכז ותל אביב</span>
+            <span class="tag">☁️ ענן AWS & M365</span>
+            <span class="tag">🔑 Entra ID & Active Directory</span>
+            <span class="tag">🖥️ שרתי RDS וניהול רשתות</span>
+          </div>
+        </div>
+
+        <aside class="card-bg p-6" style="width:100%; max-width:22rem; display:flex; flex-direction:column; gap:1.25rem;">
+          <div class="flex items-center justify-between font-mono text-xs" style="color:#94a3b8; border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
+            <span>sysadmin_profile.env</span>
+            <span style="color:#10b981;">● Online</span>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="profile-img-container">
+              <img src="/amir.jpg" alt="אמיר שאול" class="profile-img" />
+            </div>
+            <div>
+              <h2 style="font-size:1.15rem; font-weight:bold; color:#fff;">אמיר שאול</h2>
+              <p class="font-mono" style="font-size:0.75rem; color:#22d3ee;">IT System Engineer</p>
+              <span style="font-size:0.65rem; color:#60a5fa; background:#1e293b; padding:0.15rem 0.5rem; border-radius:0.25rem; font-mono; display:inline-block; margin-top:0.25rem;">10,000+ Connections</span>
+            </div>
+          </div>
+
+          <div class="font-mono" style="font-size:0.75rem; background:#020617; padding:0.75rem; border-radius:0.5rem; border:1px solid #1e293b; line-height:1.6;">
+            <p><span style="color:#22d3ee;">amir@shaul:~$</span> status --ready</p>
+            <p><span style="color:#64748b;">Company:</span> Kali Group</p>
+            <p><span style="color:#64748b;">Location:</span> Holon / Tel Aviv</p>
+          </div>
+
+          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="btn-cyan font-mono text-xs">SEND MESSAGE // צור קשר</a>
+        </aside>
+      </section>
+
+      <!-- תחומי התמחות -->
+      <section class="space-y-6">
+        <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
+          <h2 class="font-mono text-xs" style="color:#22d3ee; font-weight:bold;">// CORE IT & SYSTEM COMPETENCIES</h2>
+          <span class="font-mono text-xs" style="color:#64748b;">תחומי התמחות בסיסטם</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <span style="color:#22d3ee; font-size:0.65rem;">01 / CLOUD & IDENTITY</span>
+            <h3 style="font-size:0.9rem; font-weight:bold; color:#fff;">ענן AWS ו-Entra ID</h3>
+            <p style="color:#94a3b8; font-family:sans-serif; line-height:1.6;">ניהול סביבות ענן היברידיות, Single Sign-On (SSO), אימות רב-שלבי (MFA), והגדרת מדיניות אבטחת מידע וזהויות.</p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <span style="color:#22d3ee; font-size:0.65rem;">02 / ENTERPRISE COLLAB</span>
+            <h3 style="font-size:0.9rem; font-weight:bold; color:#fff;">Microsoft 365 & Exchange</h3>
+            <p style="color:#94a3b8; font-family:sans-serif; line-height:1.6;">ניהול תיבות דואר ארגוניות, ניתוב דואר ומניעת ספאם, שיתוף יומנים ארגוני, וסביבות Teams & SharePoint.</p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <span style="color:#22d3ee; font-size:0.65rem;">03 / REMOTE ACCESS</span>
+            <h3 style="font-size:0.9rem; font-weight:bold; color:#fff;">שרתי Terminal ו-RDS</h3>
+            <p style="color:#94a3b8; font-family:sans-serif; line-height:1.6;">הקמה ותחזוקת שרתי Terminal ו-RDS, ניהול גישה מרחוק מאובטחת, חלוקת משאבים ופרופילי משתמשים בארגון.</p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <span style="color:#22d3ee; font-size:0.65rem;">04 / AUTOMATION</span>
+            <h3 style="font-size:0.9rem; font-weight:bold; color:#fff;">אוטומציה וסקריפטים</h3>
+            <p style="color:#94a3b8; font-family:sans-serif; line-height:1.6;">אוטומציית משימות שגרתיות וסיסטם באמצעות סקריפטים, שילוב כלי AI לייעול תהליכי עבודה ותמיכת IT מהירה.</p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <span style="color:#22d3ee; font-size:0.65rem;">05 / DIRECTORY & POLICIES</span>
+            <h3 style="font-size:0.9rem; font-weight:bold; color:#fff;">Active Directory & רשתות</h3>
+            <p style="color:#94a3b8; font-family:sans-serif; line-height:1.6;">ניהול Forest/Domain, הגדרות Group Policy (GPO) קפדניות, הרשאות קבצים (NTFS), ותשתיות DNS/DHCP.</p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <span style="color:#22d3ee; font-size:0.65rem;">06 / ENTERPRISE ERP</span>
+            <h3 style="font-size:0.9rem; font-weight:bold; color:#fff;">ניהול מערכות SAP</h3>
+            <p style="color:#94a3b8; font-family:sans-serif; line-height:1.6;">ניהול הרשאות ותחזוקת סביבות SAP מורכבות, טיפול במשתמשים ותמיכה בתהליכים תפעוליים בארגונים גדולים.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ניסיון תעסוקתי -->
+      <section class="space-y-6">
+        <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
+          <h2 class="font-mono text-xs" style="color:#22d3ee; font-weight:bold;">// PROFESSIONAL EXPERIENCE</h2>
+          <span class="font-mono text-xs" style="color:#64748b;">ניסיון תעסוקתי</span>
+        </div>
+
+        <div class="space-y-4">
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
+              <h3 style="font-size:1.1rem; font-weight:bold; color:#fff;">System Administrator <span style="color:#22d3ee; font-weight:normal;">@ קבוצת קלי (Kali Group)</span></h3>
+              <span class="font-mono" style="font-size:0.75rem; color:#94a3b8;">יולי 2025 - נוכחי</span>
+            </div>
+            <p style="font-size:0.85rem; color:#cbd5e1; line-height:1.6;">
+              ניהול תשתיות המחשוב והתקשורת הארגוניות של הקבוצה. הובלת תהליכי תצורה וניהול שוטף בסביבות Microsoft 365 ו-Entra ID, ניהול שרתי Exchange ו-Terminal Servers, הגדרת הרשאות משתמשים ומדיניות אבטחת מידע, ניטור שרתים שוטף, ואוטומציית משימות סיסטם לייעול התפעול.
+            </p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
+              <h3 style="font-size:1.1rem; font-weight:bold; color:#fff;">IT Specialist & System Support <span style="color:#22d3ee; font-weight:normal;">@ Matrix</span></h3>
+              <span class="font-mono" style="font-size:0.75rem; color:#94a3b8;">מרץ 2024 - יולי 2025</span>
+            </div>
+            <p style="font-size:0.85rem; color:#cbd5e1; line-height:1.6;">
+              מתן פתרונות מחשוב וסיסטם מתקדמים, ליווי ותחזוקת סביבות עבודה מרחוק (Remote Workspaces), פתרון תקלות תשתית מורכבות ברמת השרתים ותחנות הקצה, ותמיכה בטכנולוגיות רשת מתקדמות.
+            </p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
+              <h3 style="font-size:1.1rem; font-weight:bold; color:#fff;">System Administrator & SAP Manager <span style="color:#22d3ee; font-weight:normal;">@ צה"ל (IDF)</span></h3>
+              <span class="font-mono" style="font-size:0.75rem; color:#94a3b8;">מרץ 2020 - נובמבר 2022</span>
+            </div>
+            <p style="font-size:0.85rem; color:#cbd5e1; line-height:1.6;">
+              שירות צבאי מלא כמנהל מערכות מידע ומנהל מערכות SAP. ניהול משתמשים והרשאות ב-Active Directory, טיפול שוטף בתשתיות סיסטם ורשתות, ותמיכה במערכות קריטיות בתנאי שטח ומבצעיות.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- השכלה -->
+      <section class="space-y-6">
+        <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
+          <h2 class="font-mono text-xs" style="color:#22d3ee; font-weight:bold;">// EDUCATION & QUALIFICATIONS</h2>
+          <span class="font-mono text-xs" style="color:#64748b;">השכלה והסמכות</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.25rem;">
+            <span class="font-mono" style="color:#22d3ee; font-size:0.75rem;">ספט׳ 2022 - מרץ 2024</span>
+            <h3 style="font-size:0.95rem; font-weight:bold; color:#fff;">הנדסאי תוכנה ופיתוח Full Stack</h3>
+            <p style="font-size:0.8rem; color:#94a3b8;">מכללות אורט (ORT Colleges)</p>
+          </div>
+
+          <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.25rem;">
+            <span class="font-mono" style="color:#22d3ee; font-size:0.75rem;">ספט׳ 2013 - יוני 2019</span>
+            <h3 style="font-size:0.95rem; font-weight:bold; color:#fff;">תעודת בגרות מלאה</h3>
+            <p style="font-size:0.8rem; color:#94a3b8;">תיכון הרצוג חולון</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="card-bg p-6" style="padding:2.5rem 1.5rem; text-align:center; display:flex; flex-direction:column; align-items:center; gap:1.25rem; background:linear-gradient(to right, #0f172a, #020617); border-color:rgba(6,182,212,0.3);">
+        <h2 style="font-size:1.5rem; font-weight:bold; color:#fff;">מעוניינים בחיזוק מערך ה-IT והסיסטם בארגון?</h2>
+        <p style="color:#cbd5e1; font-size:0.85rem; max-width:32rem; line-height:1.6;">
+          זמין להובלת תשתיות IT, ענן וניהול רשתות באזור המרכז ותל אביב (היברידי או On-site).
+        </p>
+        <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" class="btn-cyan font-mono text-xs" style="width:auto; padding:0.75rem 2rem; border-radius:9999px;">
+          יצירת קשר / Contact Form
+        </a>
+      </section>
+
+    </main>
+
+    <footer class="w-full text-center py-8 font-mono text-xs" style="color:#64748b; border-top:1px solid #1e293b; margin-top:4rem;">
+      © 2026 AMIR SHAUL | IT SYSTEM ENGINEER & INFRASTRUCTURE | ALL SYSTEMS OPERATIONAL
+    </footer>
+
+    <script>
+      const bar = document.getElementById('scroll-progress');
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 1;
+        if (bar) bar.style.transform = `scaleX(${progress})`;
+      }, { passive: true });
+    </script>
   </body>
 </html>
