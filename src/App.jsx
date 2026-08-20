@@ -149,6 +149,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'in_progress', 'completed'
+  const [showGlobalAssetsModal, setShowGlobalAssetsModal] = useState(false);
   
   // New Employee Form
   const [showAddForm, setShowAddForm] = useState(false);
@@ -197,20 +198,26 @@ export default function App() {
   const loadEmployees = async () => {
     try {
       const data = await db.getEmployees();
-      const formatted = (data || []).map(u => ({
-        id: u.id,
-        name: u.name,
-        email: u.email,
-        department: u.department || 'כללי',
-        role: u.role || 'עובד/ת',
-        manager: u.manager || '',
-        target_date: u.target_date || '',
-        type: u.type || 'onboarding',
-        completed: (u.completed && typeof u.completed === 'object' && !Array.isArray(u.completed)) ? u.completed : {},
-        custom_tasks: Array.isArray(u.custom_tasks) ? u.custom_tasks : (u.type === 'offboarding' ? [...DEFAULT_OFFBOARDING_TASKS] : [...DEFAULT_ONBOARDING_TASKS]),
-        assets: Array.isArray(u.assets) ? u.assets : [],
-        notes: Array.isArray(u.notes) ? u.notes : []
-      }));
+      const formatted = (data || []).map(u => {
+        const isOff = u.type === 'offboarding';
+        const defaultTasks = isOff ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS;
+        const initialTasks = (Array.isArray(u.custom_tasks) && u.custom_tasks.length > 0) ? u.custom_tasks : defaultTasks;
+        
+        return {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          department: u.department || 'כללי',
+          role: u.role || 'עובד/ת',
+          manager: u.manager || '',
+          target_date: u.target_date || '',
+          type: u.type || 'onboarding',
+          completed: (u.completed && typeof u.completed === 'object' && !Array.isArray(u.completed)) ? u.completed : {},
+          custom_tasks: initialTasks,
+          assets: Array.isArray(u.assets) ? u.assets : [],
+          notes: Array.isArray(u.notes) ? u.notes : []
+        };
+      });
       setEmployees(formatted);
       if (!selectedId && formatted.length > 0) {
         setSelectedId(formatted[0].id);
@@ -278,14 +285,37 @@ export default function App() {
     await db.addEmployee(newEmp);
   };
 
-  const handleToggleTask = async (taskName) => {
+  // Helper to check task completion (supports index or task title)
+  const getTaskLog = (emp, task, index) => {
+    if (!emp || !emp.completed) return null;
+    return emp.completed[task] || emp.completed[String(index)] || null;
+  };
+
+  const getEmployeeProgress = (emp) => {
+    if (!emp) return { total: 0, done: 0, prog: 0, isDone: false };
+    const tasks = emp.custom_tasks && emp.custom_tasks.length > 0
+      ? emp.custom_tasks
+      : (emp.type === 'offboarding' ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS);
+    
+    let done = 0;
+    tasks.forEach((t, i) => {
+      if (getTaskLog(emp, t, i)) done++;
+    });
+    const total = tasks.length;
+    const prog = total > 0 ? Math.round((done / total) * 100) : 100;
+    return { total, done, prog, isDone: total > 0 && done === total };
+  };
+
+  const handleToggleTask = async (taskName, taskIndex) => {
     const currentEmp = employees.find(e => e.id === selectedId);
     if (!currentEmp) return;
 
     const completedObj = { ...currentEmp.completed };
+    const isDone = !!getTaskLog(currentEmp, taskName, taskIndex);
 
-    if (completedObj[taskName]) {
+    if (isDone) {
       delete completedObj[taskName];
+      delete completedObj[String(taskIndex)];
     } else {
       const now = new Date();
       const timeStr = `${now.getDate()}/${now.getMonth() + 1} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
@@ -325,14 +355,15 @@ export default function App() {
     await db.updateEmployee(selectedId, { custom_tasks: updatedTasks });
   };
 
-  const handleDeleteTask = async (taskName, e) => {
+  const handleDeleteTask = async (taskName, taskIndex, e) => {
     e.stopPropagation();
     const currentEmp = employees.find(e => e.id === selectedId);
     if (!currentEmp) return;
 
-    const updatedTasks = currentEmp.custom_tasks.filter(t => t !== taskName);
+    const updatedTasks = currentEmp.custom_tasks.filter((t, i) => t !== taskName);
     const updatedCompleted = { ...currentEmp.completed };
     delete updatedCompleted[taskName];
+    delete updatedCompleted[String(taskIndex)];
 
     const updatedEmployees = employees.map(emp => 
       emp.id === selectedId ? { ...emp, custom_tasks: updatedTasks, completed: updatedCompleted } : emp
@@ -426,12 +457,8 @@ export default function App() {
 
     employees.forEach(e => {
       const isOff = e.type === 'offboarding';
-      const tasksList = e.custom_tasks || (isOff ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS);
-      const total = tasksList.length;
-      let completedCount = 0;
-      tasksList.forEach(t => { if (e.completed?.[t]) completedCount++; });
-      const prog = total > 0 ? Math.round((completedCount / total) * 100) : 100;
-      const statusText = prog === 100 ? 'הושלם' : 'בתהליך';
+      const { prog, isDone } = getEmployeeProgress(e);
+      const statusText = isDone ? 'הושלם' : 'בתהליך';
       csvContent += `"${e.name}","${e.email}","${e.department}","${e.role}","${e.manager}","${isOff ? 'עזיבה' : 'קליטה'}","${statusText}","${prog}%","${e.target_date}"\n`;
     });
 
@@ -447,16 +474,19 @@ export default function App() {
   // Metrics Calculations
   const totalEmployeesCount = employees.length;
   let completedProcessesCount = 0;
-  let totalAssetsIssuedCount = 0;
+  let allIssuedAssetsList = [];
 
   employees.forEach(emp => {
-    const tasksList = emp.custom_tasks || (emp.type === 'offboarding' ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS);
-    let done = 0;
-    tasksList.forEach(t => { if (emp.completed?.[t]) done++; });
-    if (tasksList.length > 0 && done === tasksList.length) {
-      completedProcessesCount++;
-    }
-    totalAssetsIssuedCount += (emp.assets?.length || 0);
+    const { isDone } = getEmployeeProgress(emp);
+    if (isDone) completedProcessesCount++;
+    (emp.assets || []).forEach(a => {
+      allIssuedAssetsList.push({
+        ...a,
+        employeeName: emp.name,
+        employeeEmail: emp.email,
+        employeeDept: emp.department
+      });
+    });
   });
 
   const inProgressCount = totalEmployeesCount - completedProcessesCount;
@@ -469,13 +499,10 @@ export default function App() {
       emp.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
       emp.role.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const tasksList = emp.custom_tasks || (emp.type === 'offboarding' ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS);
-    let done = 0;
-    tasksList.forEach(t => { if (emp.completed?.[t]) done++; });
-    const isCompleted = tasksList.length > 0 && done === tasksList.length;
+    const { isDone } = getEmployeeProgress(emp);
 
-    if (statusFilter === 'in_progress') return matchesSearch && !isCompleted;
-    if (statusFilter === 'completed') return matchesSearch && isCompleted;
+    if (statusFilter === 'in_progress') return matchesSearch && !isDone;
+    if (statusFilter === 'completed') return matchesSearch && isDone;
     return matchesSearch;
   });
 
@@ -520,11 +547,11 @@ export default function App() {
     }
 
     const selectedEmployee = employees.find(e => e.id === selectedId);
-    const selectedTasks = selectedEmployee?.custom_tasks || (selectedEmployee?.type === 'offboarding' ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS);
+    const selectedTasks = selectedEmployee?.custom_tasks && selectedEmployee.custom_tasks.length > 0 
+      ? selectedEmployee.custom_tasks 
+      : (selectedEmployee?.type === 'offboarding' ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS);
     
-    let selectedDoneCount = 0;
-    selectedTasks.forEach(t => { if (selectedEmployee?.completed?.[t]) selectedDoneCount++; });
-    const isSelectedFullyDone = selectedTasks.length > 0 && selectedDoneCount === selectedTasks.length;
+    const { total: selTotal, done: selDone, isDone: isSelectedFullyDone } = getEmployeeProgress(selectedEmployee);
 
     return (
       <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col md:flex-row" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Rubik, Arial, sans-serif' }} dir="rtl">
@@ -578,19 +605,19 @@ export default function App() {
             <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
               <button 
                 onClick={() => setStatusFilter('all')} 
-                className={`flex-1 py-1 rounded-lg transition-all ${statusFilter === 'all' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${statusFilter === 'all' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
                 הכל ({employees.length})
               </button>
               <button 
                 onClick={() => setStatusFilter('in_progress')} 
-                className={`flex-1 py-1 rounded-lg transition-all ${statusFilter === 'in_progress' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:text-white'}`}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${statusFilter === 'in_progress' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:text-white'}`}
               >
                 בתהליך ({inProgressCount})
               </button>
               <button 
                 onClick={() => setStatusFilter('completed')} 
-                className={`flex-1 py-1 rounded-lg transition-all ${statusFilter === 'completed' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-slate-400 hover:text-white'}`}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${statusFilter === 'completed' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-slate-400 hover:text-white'}`}
               >
                 הושלמו ({completedProcessesCount})
               </button>
@@ -670,12 +697,7 @@ export default function App() {
             ) : (
               filteredEmployees.map(emp => {
                 const isOff = emp.type === 'offboarding';
-                const tasksList = emp.custom_tasks || (isOff ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS);
-                const total = tasksList.length;
-                let done = 0;
-                tasksList.forEach(t => { if (emp.completed?.[t]) done++; });
-                const prog = total > 0 ? Math.round((done / total) * 100) : 100;
-                const isDone = done === total && total > 0;
+                const { prog, isDone } = getEmployeeProgress(emp);
                 const isSelected = emp.id === selectedId;
 
                 return (
@@ -727,9 +749,12 @@ export default function App() {
         {/* Main Details & Metrics Dashboard Area */}
         <div className="flex-1 p-6 md:p-8 overflow-y-auto space-y-6">
           
-          {/* Top Metrics Dashboard */}
+          {/* Top Metrics Dashboard (Clickable) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-            <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5">
+            <div 
+              onClick={() => setStatusFilter('all')} 
+              className="bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5 cursor-pointer transition-all hover:border-cyan-500/40"
+            >
               <div className="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
                 <Users size={22} />
               </div>
@@ -739,7 +764,10 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5">
+            <div 
+              onClick={() => setStatusFilter('in_progress')} 
+              className="bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5 cursor-pointer transition-all hover:border-amber-500/40"
+            >
               <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                 <AlertCircle size={22} />
               </div>
@@ -749,7 +777,10 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5">
+            <div 
+              onClick={() => setStatusFilter('completed')} 
+              className="bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5 cursor-pointer transition-all hover:border-emerald-500/40"
+            >
               <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                 <CheckCircle size={22} />
               </div>
@@ -759,13 +790,16 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5">
+            <div 
+              onClick={() => setShowGlobalAssetsModal(true)} 
+              className="bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5 cursor-pointer transition-all hover:border-blue-500/40"
+            >
               <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
                 <Laptop size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-medium">ציוד שנופק</p>
-                <h3 className="text-xl font-bold text-white mt-0.5">{totalAssetsIssuedCount}</h3>
+                <p className="text-xs text-slate-400 font-medium">ציוד שנופק (צפה)</p>
+                <h3 className="text-xl font-bold text-white mt-0.5">{allIssuedAssetsList.length}</h3>
               </div>
             </div>
           </div>
@@ -805,7 +839,7 @@ export default function App() {
                   onClick={() => setActiveTab('tasks')}
                   className={`px-4 py-2 rounded-xl transition-all ${activeTab === 'tasks' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800'}`}
                 >
-                  📋 צ'ק-ליסט משימות ({selectedDoneCount}/{selectedTasks.length})
+                  📋 צ'ק-ליסט משימות ({selDone}/{selTotal})
                 </button>
                 <button 
                   onClick={() => setActiveTab('assets')}
@@ -842,13 +876,13 @@ export default function App() {
                   {/* Tasks List */}
                   <div className="space-y-2.5">
                     {selectedTasks.map((task, idx) => {
-                      const taskLog = selectedEmployee.completed?.[task];
+                      const taskLog = getTaskLog(selectedEmployee, task, idx);
                       const isDone = !!taskLog;
 
                       return (
                         <div 
                           key={idx} 
-                          onClick={() => handleToggleTask(task)}
+                          onClick={() => handleToggleTask(task, idx)}
                           className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all cursor-pointer select-none gap-2 ${
                             isDone 
                               ? 'bg-slate-950/40 border-slate-800/80 text-slate-400' 
@@ -872,7 +906,7 @@ export default function App() {
                               </div>
                             )}
                             <button 
-                              onClick={(e) => handleDeleteTask(task, e)} 
+                              onClick={(e) => handleDeleteTask(task, idx, e)} 
                               title="מחק משימה זו לעובד"
                               className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors"
                             >
@@ -972,6 +1006,61 @@ export default function App() {
             </div>
           )}
         </div>
+
+        {/* Global Assets Modal (When clicking on Top Metric) */}
+        {showGlobalAssetsModal && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-3xl p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2 text-cyan-400 font-bold">
+                  <Laptop size={20} />
+                  <h2 className="text-lg text-white">ריכוז ציוד וחומרה שנופקו בארגון ({allIssuedAssetsList.length})</h2>
+                </div>
+                <button onClick={() => setShowGlobalAssetsModal(false)} className="text-slate-400 hover:text-white p-1 rounded-lg">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto">
+                {allIssuedAssetsList.length === 0 ? (
+                  <p className="text-center text-xs text-slate-500 py-12 font-medium">לא שויך ציוד לאף עובד במערכת</p>
+                ) : (
+                  <table className="w-full text-right text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-slate-400 font-bold">
+                        <th className="py-2.5 px-3">שם העובד/ת</th>
+                        <th className="py-2.5 px-3">מחלקה</th>
+                        <th className="py-2.5 px-3">פריט חומרה</th>
+                        <th className="py-2.5 px-3">מספר סידורי (S/N)</th>
+                        <th className="py-2.5 px-3">נופק ע"י</th>
+                        <th className="py-2.5 px-3">תאריך</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 font-medium text-slate-200">
+                      {allIssuedAssetsList.map((asset, idx) => (
+                        <tr key={idx} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="py-3 px-3 font-bold text-white">{asset.employeeName}</td>
+                          <td className="py-3 px-3 text-slate-400">{asset.employeeDept}</td>
+                          <td className="py-3 px-3 text-cyan-400 font-semibold">{asset.item}</td>
+                          <td className="py-3 px-3 font-mono text-slate-300">{asset.serial}</td>
+                          <td className="py-3 px-3 text-slate-400">{asset.assigned_by}</td>
+                          <td className="py-3 px-3 text-slate-400">{asset.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              <div className="pt-3 border-t border-slate-800 flex justify-end">
+                <button onClick={() => setShowGlobalAssetsModal(false)} className="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition-all">
+                  סגור
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }
@@ -1063,7 +1152,7 @@ export default function App() {
               <p><span className="text-slate-400">Location:</span> Holon / Tel Aviv</p>
             </div>
 
-            <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" className="block w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+            <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" className="block w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black text-center font-bold text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               SEND MESSAGE // צור קשר
             </a>
           </aside>
