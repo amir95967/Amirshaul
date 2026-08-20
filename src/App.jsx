@@ -1,5 +1,4 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Layout, 
@@ -83,11 +82,8 @@ const ProjectCard = ({ iconName, title, desc, link, gradient }) => (
 function HomePage() {
   return (
     <div className="min-h-screen bg-[#020617] w-full flex flex-col items-center relative overflow-hidden font-sans">
-      
-      {/* Background Glows */}
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_rgba(6,182,212,0.15),transparent_60%)]" />
 
-      {/* כפתור יצירת קשר מרחף */}
       <a
         href="https://form.amirshaul.online"
         target="_blank"
@@ -105,8 +101,6 @@ function HomePage() {
       </a>
 
       <main className="relative z-10 flex flex-col items-center w-full max-w-7xl px-6 py-24">
-
-        {/* Hero Section */}
         <section className="text-center mb-32 flex flex-col items-center">
           <div className="flex flex-col items-center">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold tracking-[0.3em] text-cyan-400 uppercase mb-10">
@@ -138,7 +132,6 @@ function HomePage() {
                
                <div className="w-px h-4 bg-white/10 self-center" />
 
-               {/* כפתור יצירת קשר מהבהב */}
                <motion.a 
                  href="https://form.amirshaul.online" 
                  className="text-cyan-400 flex items-center space-x-2 no-underline"
@@ -163,7 +156,6 @@ function HomePage() {
           </div>
         </section>
 
-        {/* Project Grid */}
         <section className="w-full max-w-6xl">
           <div className="flex flex-col items-center mb-16">
             <h2 className="text-sm font-black uppercase tracking-[0.5em] text-slate-400 mb-4">Network Instances</h2>
@@ -183,7 +175,6 @@ function HomePage() {
             ))}
           </div>
         </section>
-
       </main>
 
       <footer className="w-full text-center py-16 mt-20 border-t border-white/5 bg-white/[0.01] relative z-10">
@@ -191,21 +182,29 @@ function HomePage() {
           © 2026 AMIRSHAUL.ONLINE | All Systems Nominal
         </p>
       </footer>
-
     </div>
   );
 }
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* דף הבית */}
-        <Route path="/" element={<HomePage />} />
-
-        {/* הדף הנעול למערכת ה-IT */}
-        <Route path="/kali" element={<KaliDashboard />} />
-      </Routes>
-    </BrowserRouter>
+  const [pathname, setPathname] = useState(
+    typeof window !== 'undefined' ? window.location.pathname : '/'
   );
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setPathname(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  // בודק אם הכתובת היא /kali
+  const cleanPath = pathname.toLowerCase().replace(/\/$/, '');
+  if (cleanPath === '/kali') {
+    return <KaliDashboard />;
+  }
+
+  return <HomePage />;
 }
