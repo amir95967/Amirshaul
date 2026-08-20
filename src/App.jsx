@@ -6,17 +6,26 @@ import {
   ShieldCheck, 
   ArrowUpRight, 
   Mail, 
-  Server,
-  Cloud,
-  Lock,
-  Cpu,
-  Database,
-  Terminal,
-  Trash2,
-  CheckCircle2,
-  Circle,
-  User,
-  Clock
+  Server, 
+  Cloud, 
+  Lock, 
+  Cpu, 
+  Database, 
+  Terminal, 
+  Trash2, 
+  CheckCircle2, 
+  Circle, 
+  User, 
+  Clock, 
+  Laptop, 
+  Copy, 
+  Check, 
+  Download, 
+  Printer, 
+  FileText, 
+  Plus, 
+  Calendar, 
+  Send 
 } from 'lucide-react';
 
 const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
@@ -56,11 +65,11 @@ const db = {
     });
     return res.ok;
   },
-  async updateTasks(id, completed) {
+  async updateEmployee(id, payload) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/employees?id=eq.${id}`, {
       method: 'PATCH',
       headers: this.headers,
-      body: JSON.stringify({ completed })
+      body: JSON.stringify(payload)
     });
     return res.ok;
   },
@@ -74,21 +83,21 @@ const db = {
 };
 
 const ONBOARDING_TASKS = [
-  'פתיחת משתמש ב-Active Directory / 365',
-  'שיוך רישיונות (M365, Teams וכו׳)',
-  'הוספה לקבוצות תפוצה ומחלקות',
-  'הכנת מחשב נייד והתקנת תוכנות',
-  'הגדרת גישת VPN / MFA',
-  'מסירת ציוד ושליחת פרטי התחברות'
+  'פתיחת משתמש ב-Active Directory / Entra ID',
+  'שיוך רישיונות (Microsoft 365, Teams)',
+  'הוספה לקבוצות תפוצה, אבטחה ומחלקות',
+  'הכנת מחשב נייד, התקנת סביבה ותוכנות',
+  'הגדרת אימות רב-שלבי (MFA) וחיבור VPN',
+  'מסירת ציוד וחתימה על טופס קבלה'
 ];
 
 const OFFBOARDING_TASKS = [
-  'חסימת משתמש (Disable Account)',
-  'איפוס סיסמה וניתוק מכל ה-Sessions',
-  'המרת תיבה ל-Shared ושלילת רישיונות',
-  'הסרה מכל קבוצות התפוצה וה-Security',
-  'איסוף מחשב, ציוד היקפי וביטול שיוך ב-MDM',
-  'גיבוי קבצי OneDrive/מחשב מקומי'
+  'חסימת משתמש (Disable Account) ב-AD/Entra',
+  'איפוס סיסמה וניתוק מכל ה-Active Sessions',
+  'המרת תיבה ל-Shared ושלילת רישיונות M365',
+  'הסרה מכל קבוצות התפוצה וה-Security Groups',
+  'איסוף מחשב וציוד היקפי וביטול שיוך ב-MDM',
+  'גיבוי קבצי OneDrive/מחשב מקומי לארכיון'
 ];
 
 const iconsMap = { Layout, ShieldCheck, ArrowUpRight, Code2, Mail, HelpCircle, Server, Cloud, Lock, Cpu, Database, Terminal };
@@ -137,10 +146,22 @@ export default function App() {
 
   const [employees, setEmployees] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  
+  // New Employee Form States
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newDept, setNewDept] = useState('');
+  const [newRole, setNewRole] = useState('');
+  const [newManager, setNewManager] = useState('');
+  const [newTargetDate, setNewTargetDate] = useState('');
   const [newType, setNewType] = useState('onboarding');
+
+  // Active Tab & Tool States
+  const [activeTab, setActiveTab] = useState('tasks'); // 'tasks', 'assets', 'powershell', 'notes'
+  const [copiedScript, setCopiedScript] = useState(false);
+  const [newAssetItem, setNewAssetItem] = useState('');
+  const [newAssetSerial, setNewAssetSerial] = useState('');
+  const [newNoteText, setNewNoteText] = useState('');
 
   useEffect(() => {
     const checkUrl = () => {
@@ -176,9 +197,14 @@ export default function App() {
         id: u.id,
         name: u.name,
         email: u.email,
-        department: u.department,
-        type: u.type,
-        completed: (u.completed && typeof u.completed === 'object' && !Array.isArray(u.completed)) ? u.completed : {}
+        department: u.department || 'כללי',
+        role: u.role || 'עובד/ת',
+        manager: u.manager || '',
+        target_date: u.target_date || '',
+        type: u.type || 'onboarding',
+        completed: (u.completed && typeof u.completed === 'object' && !Array.isArray(u.completed)) ? u.completed : {},
+        assets: Array.isArray(u.assets) ? u.assets : [],
+        notes: Array.isArray(u.notes) ? u.notes : []
       }));
       setEmployees(formatted);
       if (!selectedId && formatted.length > 0) {
@@ -222,8 +248,13 @@ export default function App() {
       name: newName,
       email: newEmail,
       department: newDept || 'כללי',
+      role: newRole || 'עובד/ת',
+      manager: newManager || '',
+      target_date: newTargetDate || '',
       type: newType,
-      completed: {}
+      completed: {},
+      assets: [],
+      notes: []
     };
 
     setEmployees([newEmp, ...employees]);
@@ -231,6 +262,9 @@ export default function App() {
     setNewName('');
     setNewEmail('');
     setNewDept('');
+    setNewRole('');
+    setNewManager('');
+    setNewTargetDate('');
 
     await db.addEmployee(newEmp);
   };
@@ -258,17 +292,168 @@ export default function App() {
     );
 
     setEmployees(updatedEmployees);
-    await db.updateTasks(selectedId, completedObj);
+    await db.updateEmployee(selectedId, { completed: completedObj });
+  };
+
+  const handleAddAsset = async (e) => {
+    e.preventDefault();
+    if (!newAssetItem) return;
+
+    const currentEmp = employees.find(e => e.id === selectedId);
+    if (!currentEmp) return;
+
+    const newAsset = {
+      id: Date.now().toString(),
+      item: newAssetItem,
+      serial: newAssetSerial || 'N/A',
+      assigned_by: currentUser?.full_name || 'IT',
+      date: new Date().toLocaleDateString('he-IL')
+    };
+
+    const updatedAssets = [...currentEmp.assets, newAsset];
+    const updatedEmployees = employees.map(emp => 
+      emp.id === selectedId ? { ...emp, assets: updatedAssets } : emp
+    );
+
+    setEmployees(updatedEmployees);
+    setNewAssetItem('');
+    setNewAssetSerial('');
+    await db.updateEmployee(selectedId, { assets: updatedAssets });
+  };
+
+  const handleDeleteAsset = async (assetId) => {
+    const currentEmp = employees.find(e => e.id === selectedId);
+    if (!currentEmp) return;
+
+    const updatedAssets = currentEmp.assets.filter(a => a.id !== assetId);
+    const updatedEmployees = employees.map(emp => 
+      emp.id === selectedId ? { ...emp, assets: updatedAssets } : emp
+    );
+
+    setEmployees(updatedEmployees);
+    await db.updateEmployee(selectedId, { assets: updatedAssets });
+  };
+
+  const handleAddNote = async (e) => {
+    e.preventDefault();
+    if (!newNoteText.trim()) return;
+
+    const currentEmp = employees.find(e => e.id === selectedId);
+    if (!currentEmp) return;
+
+    const now = new Date();
+    const timeStr = `${now.getDate()}/${now.getMonth() + 1} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    const newNote = {
+      id: Date.now().toString(),
+      text: newNoteText,
+      author: currentUser?.full_name || currentUser?.username || 'IT',
+      time: timeStr
+    };
+
+    const updatedNotes = [newNote, ...currentEmp.notes];
+    const updatedEmployees = employees.map(emp => 
+      emp.id === selectedId ? { ...emp, notes: updatedNotes } : emp
+    );
+
+    setEmployees(updatedEmployees);
+    setNewNoteText('');
+    await db.updateEmployee(selectedId, { notes: updatedNotes });
   };
 
   const handleDeleteEmployee = async (id, e) => {
     e.stopPropagation();
+    if (!confirm('האם אתה בטוח שברצונך למחוק עובד זה?')) return;
     const updated = employees.filter(emp => emp.id !== id);
     setEmployees(updated);
     if (selectedId === id) {
       setSelectedId(updated[0]?.id || null);
     }
     await db.deleteEmployee(id);
+  };
+
+  // Generate PowerShell Script
+  const generatePowerShell = (emp) => {
+    if (!emp) return '';
+    const username = emp.email.split('@')[0];
+    if (emp.type === 'onboarding') {
+      return `# ========================================================
+# KALI GROUP IT // NEW USER AUTOMATION: ${emp.name}
+# ========================================================
+
+# 1. Create Active Directory User
+$Password = ConvertTo-SecureString "Kali${new Date().getFullYear()}!" -AsPlainText -Force
+New-ADUser -Name "${emp.name}" \`
+  -SamAccountName "${username}" \`
+  -UserPrincipalName "${emp.email}" \`
+  -Department "${emp.department}" \`
+  -Title "${emp.role}" \`
+  -AccountPassword $Password \`
+  -Enabled $true \`
+  -ChangePasswordAtLogon $true
+
+# 2. Add to Department Security Group
+Add-ADGroupMember -Identity "${emp.department}-Users" -Members "${username}"
+
+# 3. Assign Microsoft 365 License (Microsoft Graph PowerShell)
+# Connect-MgGraph -Scopes "User.ReadWrite.All", "Directory.ReadWrite.All"
+# Set-MgUserLicense -UserId "${emp.email}" -AddLicenses @{SkuId = "SPE_E3"} -RemoveLicenses @()
+
+Write-Host "✅ User ${emp.name} created successfully!" -ForegroundColor Green`;
+    } else {
+      return `# ========================================================
+# KALI GROUP IT // OFFBOARDING AUTOMATION: ${emp.name}
+# ========================================================
+
+# 1. Disable Active Directory Account
+Disable-ADAccount -Identity "${username}"
+Set-ADUser -Identity "${username}" -Description "Terminated on $(Get-Date -Format 'dd/MM/yyyy') by ${currentUser?.full_name || 'IT'}"
+
+# 2. Terminate all Active Microsoft 365 / Entra Sessions
+Revoke-MgUserSignInSession -UserId "${emp.email}"
+
+# 3. Convert Mailbox to Shared Mailbox & Hide from GAL
+# Set-Mailbox -Identity "${emp.email}" -Type Shared -HiddenFromAddressListsEnabled $true
+
+# 4. Remove all Group Memberships
+Get-ADPrincipalGroupMembership -Identity "${username}" | Where-Object { $_.Name -ne "Domain Users" } | Remove-ADGroupMember -Members "${username}" -Confirm:$false
+
+Write-Host "⛔ Offboarding executed for ${emp.name}!" -ForegroundColor Yellow`;
+    }
+  };
+
+  const handleCopyScript = (script) => {
+    navigator.clipboard.writeText(script);
+    setCopiedScript(true);
+    setTimeout(() => setCopiedScript(false), 2000);
+  };
+
+  // Export to CSV
+  const handleExportCSV = () => {
+    if (employees.length === 0) return;
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+    csvContent += "שם מלא,אימייל,מחלקה,תפקיד,מנהל,סטטוס,התקדמות %,תאריך יעד\n";
+
+    employees.forEach(e => {
+      const isOff = e.type === 'offboarding';
+      const total = isOff ? OFFBOARDING_TASKS.length : ONBOARDING_TASKS.length;
+      const count = Object.keys(e.completed || {}).length;
+      const prog = Math.round((count / total) * 100);
+      csvContent += `"${e.name}","${e.email}","${e.department}","${e.role}","${e.manager}","${isOff ? 'עזיבה' : 'קליטה'}","${prog}%","${e.target_date}"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `kali_it_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Print Handover Form
+  const handlePrintHandover = () => {
+    window.print();
   };
 
   // ================= KALI VIEW =================
@@ -282,7 +467,7 @@ export default function App() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">כניסת צוות IT</h2>
-              <p className="font-mono text-xs text-slate-400 mt-1">Kali Group Boarding</p>
+              <p className="font-mono text-xs text-slate-400 mt-1">Kali Group Enterprise Boarding</p>
             </div>
             <input 
               type="text" 
@@ -316,25 +501,36 @@ export default function App() {
 
     return (
       <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col md:flex-row font-sans" dir="rtl">
+        
         {/* Sidebar */}
-        <div className="w-full md:w-96 border-l border-slate-800 bg-slate-900/60 p-6 flex flex-col shrink-0">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+        <div className="w-full md:w-96 border-l border-slate-800 bg-slate-900/60 p-5 flex flex-col shrink-0">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
             <div>
               <h1 className="font-mono text-base font-bold text-cyan-400 flex items-center gap-2">
                 <Terminal size={18} />
-                IT BOARDING
+                IT OPS BOARDING
               </h1>
               <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 mt-0.5">
                 <User size={12} className="text-cyan-400" />
                 מחובר: <strong className="text-white">{currentUser.full_name}</strong>
               </span>
             </div>
-            <button onClick={handleLogout} className="font-mono text-xs text-rose-400 hover:text-rose-300">
-              יציאה
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={handleExportCSV} title="ייצוא לאקסל (CSV)" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+                <Download size={14} />
+              </button>
+              <button onClick={handleLogout} className="font-mono text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 px-2.5 py-1.5 rounded-lg border border-rose-500/20">
+                יציאה
+              </button>
+            </div>
           </div>
 
-          <form onSubmit={handleAddEmployee} className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-3 mb-6">
+          {/* Form Create */}
+          <form onSubmit={handleAddEmployee} className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 space-y-2.5 mb-5">
+            <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+              <span>הוספת עובד/ת חדש/ה</span>
+              <span className="text-cyan-400 font-bold">Cloud Synced</span>
+            </div>
             <input 
               type="text" 
               placeholder="שם מלא" 
@@ -344,12 +540,12 @@ export default function App() {
             />
             <input 
               type="email" 
-              placeholder="כתובת מייל" 
+              placeholder="כתובת מייל ארגונית" 
               value={newEmail} 
               onChange={e => setNewEmail(e.target.value)} 
               className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
             />
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <input 
                 type="text" 
                 placeholder="מחלקה" 
@@ -357,20 +553,43 @@ export default function App() {
                 onChange={e => setNewDept(e.target.value)} 
                 className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
               />
-              <select 
-                value={newType} 
-                onChange={e => setNewType(e.target.value)} 
+              <input 
+                type="text" 
+                placeholder="תפקיד" 
+                value={newRole} 
+                onChange={e => setNewRole(e.target.value)} 
                 className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
-              >
-                <option value="onboarding">קליטה (On)</option>
-                <option value="offboarding">עזיבה (Off)</option>
-              </select>
+              />
             </div>
-            <button type="submit" className="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-lg transition-all">
+            <div className="grid grid-cols-2 gap-2">
+              <input 
+                type="text" 
+                placeholder="מנהל ישיר" 
+                value={newManager} 
+                onChange={e => setNewManager(e.target.value)} 
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+              />
+              <input 
+                type="date" 
+                value={newTargetDate} 
+                onChange={e => setNewTargetDate(e.target.value)} 
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-cyan-500 font-mono"
+              />
+            </div>
+            <select 
+              value={newType} 
+              onChange={e => setNewType(e.target.value)} 
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+            >
+              <option value="onboarding">🚀 תהליך קליטה (Onboarding)</option>
+              <option value="offboarding">🛑 תהליך עזיבה (Offboarding)</option>
+            </select>
+            <button type="submit" className="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-lg transition-all shadow-md">
               + הוסף עובד ל-Cloud
             </button>
           </form>
 
+          {/* List */}
           <div className="flex-1 overflow-y-auto space-y-2">
             {employees.length === 0 ? (
               <p className="text-center text-xs text-slate-500 py-6 font-mono">אין עובדים במערכת</p>
@@ -394,7 +613,7 @@ export default function App() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-xs text-white">{emp.name}</span>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
                           isOff ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                         }`}>
@@ -405,8 +624,14 @@ export default function App() {
                         </button>
                       </div>
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-1">{emp.department} • {emp.email}</div>
-                    <div className="w-full h-1 bg-slate-900 rounded-full mt-2 overflow-hidden">
+                    <div className="text-[11px] text-slate-400 mt-1">{emp.department} • {emp.role}</div>
+                    {emp.target_date && (
+                      <div className="text-[10px] font-mono text-cyan-400/80 mt-0.5 flex items-center gap-1">
+                        <Calendar size={10} />
+                        תאריך יעד: {emp.target_date}
+                      </div>
+                    )}
+                    <div className="w-full h-1.5 bg-slate-900 rounded-full mt-2 overflow-hidden">
                       <div className={`h-full ${isOff ? 'bg-amber-400' : 'bg-cyan-400'}`} style={{ width: `${prog}%` }}></div>
                     </div>
                   </div>
@@ -416,59 +641,202 @@ export default function App() {
           </div>
         </div>
 
-        {/* Details Area */}
-        <div className="flex-1 p-8 overflow-y-auto">
+        {/* Main Details Area */}
+        <div className="flex-1 p-6 md:p-8 overflow-y-auto">
           {selectedEmployee ? (
-            <div className="max-w-2xl mx-auto space-y-6">
-              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+            <div className="max-w-3xl mx-auto space-y-6">
+              
+              {/* Header Box */}
+              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">{selectedEmployee.name}</h2>
-                  <p className="text-xs text-slate-400 font-mono mt-1">{selectedEmployee.email} | מחלקת {selectedEmployee.department}</p>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-black text-white">{selectedEmployee.name}</h2>
+                    <span className={`text-xs px-3 py-1 rounded-full font-mono ${
+                      selectedEmployee.type === 'offboarding' 
+                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' 
+                        : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                    }`}>
+                      {selectedEmployee.type === 'offboarding' ? 'תהליך עזיבה (Offboarding)' : 'תהליך קליטה (Onboarding)'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 font-mono mt-1">
+                    {selectedEmployee.email} | מחלקה: {selectedEmployee.department} | תפקיד: {selectedEmployee.role}
+                    {selectedEmployee.manager && ` | מנהל: ${selectedEmployee.manager}`}
+                  </p>
                 </div>
-                <span className={`text-xs px-3 py-1.5 rounded-full font-mono ${
-                  selectedEmployee.type === 'offboarding' 
-                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' 
-                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                }`}>
-                  {selectedEmployee.type === 'offboarding' ? 'תהליך עזיבה (Offboarding)' : 'תהליך קליטה (Onboarding)'}
-                </span>
+
+                <div className="flex items-center gap-2">
+                  <button onClick={handlePrintHandover} className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono rounded-xl border border-slate-700">
+                    <Printer size={14} />
+                    <span>טופס לחתימה</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-3">
-                <h3 className="font-mono text-xs text-cyan-400 font-bold">// צ'ק-ליסט משימות סיסטם & Audit Log:</h3>
-                {activeTasks.map((task, idx) => {
-                  const taskLog = selectedEmployee.completed?.[String(idx)];
-                  const isDone = !!taskLog;
+              {/* Navigation Tabs */}
+              <div className="flex gap-2 border-b border-slate-800 pb-2 font-mono text-xs">
+                <button 
+                  onClick={() => setActiveTab('tasks')}
+                  className={`px-4 py-2 rounded-xl transition-all ${activeTab === 'tasks' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white bg-slate-900'}`}
+                >
+                  📋 צ'ק-ליסט סיסטם ({Object.keys(selectedEmployee.completed || {}).length}/{activeTasks.length})
+                </button>
+                <button 
+                  onClick={() => setActiveTab('assets')}
+                  className={`px-4 py-2 rounded-xl transition-all ${activeTab === 'assets' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white bg-slate-900'}`}
+                >
+                  💻 ציוד ומחשוב ({selectedEmployee.assets?.length || 0})
+                </button>
+                <button 
+                  onClick={() => setActiveTab('powershell')}
+                  className={`px-4 py-2 rounded-xl transition-all ${activeTab === 'powershell' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white bg-slate-900'}`}
+                >
+                  ⚡ סקריפט PowerShell
+                </button>
+                <button 
+                  onClick={() => setActiveTab('notes')}
+                  className={`px-4 py-2 rounded-xl transition-all ${activeTab === 'notes' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white bg-slate-900'}`}
+                >
+                  📝 הערות צוות ({selectedEmployee.notes?.length || 0})
+                </button>
+              </div>
 
-                  return (
-                    <div 
-                      key={idx} 
-                      onClick={() => handleToggleTask(idx)}
-                      className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all cursor-pointer select-none gap-2 ${
-                        isDone 
-                          ? 'bg-slate-950/40 border-slate-800/80 text-slate-400' 
-                          : 'bg-slate-900/50 border-slate-800 text-slate-200 hover:border-cyan-500/40'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {isDone ? <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> : <Circle size={18} className="text-slate-600 shrink-0" />}
-                        <span className={`text-xs sm:text-sm ${isDone ? 'line-through text-slate-400' : ''}`}>{task}</span>
-                      </div>
+              {/* Tab 1: Tasks */}
+              {activeTab === 'tasks' && (
+                <div className="space-y-3">
+                  {activeTasks.map((task, idx) => {
+                    const taskLog = selectedEmployee.completed?.[String(idx)];
+                    const isDone = !!taskLog;
 
-                      {isDone && (
-                        <div className="flex items-center gap-2 font-mono text-[11px] bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg self-start sm:self-auto">
-                          <span className="text-cyan-400 font-bold">👤 {taskLog.by}</span>
-                          <span className="text-slate-500">•</span>
-                          <span className="text-slate-400 flex items-center gap-1">
-                            <Clock size={11} />
-                            {taskLog.at}
-                          </span>
+                    return (
+                      <div 
+                        key={idx} 
+                        onClick={() => handleToggleTask(idx)}
+                        className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all cursor-pointer select-none gap-2 ${
+                          isDone 
+                            ? 'bg-slate-950/40 border-slate-800/80 text-slate-400' 
+                            : 'bg-slate-900/50 border-slate-800 text-slate-200 hover:border-cyan-500/40'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {isDone ? <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> : <Circle size={18} className="text-slate-600 shrink-0" />}
+                          <span className={`text-xs sm:text-sm ${isDone ? 'line-through text-slate-400' : ''}`}>{task}</span>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+
+                        {isDone && (
+                          <div className="flex items-center gap-2 font-mono text-[11px] bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg self-start sm:self-auto">
+                            <span className="text-cyan-400 font-bold">👤 {taskLog.by}</span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400 flex items-center gap-1">
+                              <Clock size={11} />
+                              {taskLog.at}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Tab 2: Assets */}
+              {activeTab === 'assets' && (
+                <div className="space-y-4">
+                  <form onSubmit={handleAddAsset} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="פריט (למשל: Dell Latitude 5440 / מסך 27)" 
+                      value={newAssetItem} 
+                      onChange={e => setNewAssetItem(e.target.value)} 
+                      className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="מספר סידורי / Service Tag" 
+                      value={newAssetSerial} 
+                      onChange={e => setNewAssetSerial(e.target.value)} 
+                      className="w-full sm:w-48 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none focus:border-cyan-500"
+                    />
+                    <button type="submit" className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-xl transition-all flex items-center justify-center gap-1">
+                      <Plus size={14} />
+                      שייך ציוד
+                    </button>
+                  </form>
+
+                  <div className="space-y-2">
+                    {(!selectedEmployee.assets || selectedEmployee.assets.length === 0) ? (
+                      <p className="text-center text-xs text-slate-500 py-6 font-mono">לא שויך ציוד לעובד זה</p>
+                    ) : (
+                      selectedEmployee.assets.map(asset => (
+                        <div key={asset.id} className="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Laptop size={18} className="text-cyan-400" />
+                            <div>
+                              <p className="text-xs font-bold text-white">{asset.item}</p>
+                              <p className="text-[11px] font-mono text-slate-400">S/N: {asset.serial} | נמסר ע"י: {asset.assigned_by} ({asset.date})</p>
+                            </div>
+                          </div>
+                          <button onClick={() => handleDeleteAsset(asset.id)} className="text-slate-500 hover:text-rose-400 p-1.5">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 3: PowerShell Script Generator */}
+              {activeTab === 'powershell' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-mono text-xs text-slate-400">// סקריפט אוטומציה מוכן להרצה במסוף השרת:</span>
+                    <button 
+                      onClick={() => handleCopyScript(generatePowerShell(selectedEmployee))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 font-mono text-xs rounded-lg border border-cyan-500/30 transition-all"
+                    >
+                      {copiedScript ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedScript ? 'הועתק ללוח!' : 'העתק סקריפט'}
+                    </button>
+                  </div>
+                  <pre className="bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-300 overflow-x-auto leading-relaxed" dir="ltr">
+                    {generatePowerShell(selectedEmployee)}
+                  </pre>
+                </div>
+              )}
+
+              {/* Tab 4: Internal Notes */}
+              {activeTab === 'notes' && (
+                <div className="space-y-4">
+                  <form onSubmit={handleAddNote} className="flex gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="הוסף הערה פנימית לצוות ה-IT..." 
+                      value={newNoteText} 
+                      onChange={e => setNewNoteText(e.target.value)} 
+                      className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500"
+                    />
+                    <button type="submit" className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-xl transition-all flex items-center gap-1">
+                      <Send size={14} />
+                      שמור
+                    </button>
+                  </form>
+
+                  <div className="space-y-2">
+                    {(!selectedEmployee.notes || selectedEmployee.notes.length === 0) ? (
+                      <p className="text-center text-xs text-slate-500 py-6 font-mono">אין הערות פנימיות עבור עובד זה</p>
+                    ) : (
+                      selectedEmployee.notes.map(n => (
+                        <div key={n.id} className="bg-slate-900/40 border border-slate-800 rounded-xl p-3 space-y-1">
+                          <p className="text-xs text-slate-200">{n.text}</p>
+                          <p className="text-[10px] font-mono text-slate-500">נכתב ע"י {n.author} • {n.time}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
             </div>
           ) : (
             <div className="h-full flex items-center justify-center text-slate-500 text-xs font-mono">
