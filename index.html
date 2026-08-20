@@ -12,7 +12,7 @@
     <style>
       *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid #e2e8f0; }
       html { line-height: 1.5; -webkit-text-size-adjust: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 16px; scroll-behavior: smooth; }
-      body { background-color: #020617; color: #f1f5f9; min-height: 100vh; position: relative; overflow-x: hidden; }
+      body { background-color: #020617; color: #f1f5f9; min-height: 100%; position: relative; overflow-x: hidden; overflow-y: auto !important; }
       
       .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
       .font-sans { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -32,10 +32,6 @@
       .gap-10 { gap: 2.5rem; }
       .gap-4 { gap: 1rem; }
       .gap-2 { gap: 0.5rem; }
-      .space-y-20 > :not([hidden]) ~ :not([hidden]) { margin-top: 5rem; }
-      .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
-      .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
-      .space-y-2 { > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; } }
       
       .grid { display: grid; }
       .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
@@ -58,7 +54,7 @@
       .pulse-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background-color: #06b6d4; }
       .tag { padding: 0.25rem 0.75rem; background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #e2e8f0; font-size: 0.75rem; }
 
-      .profile-img-container { position: relative; width: 5.5rem; height: 5.5rem; shrink-0; }
+      .profile-img-container { position: relative; width: 5.5rem; height: 5.5rem; flex-shrink: 0; }
       .profile-img { width: 100%; height: 100%; object-fit: cover; border-radius: 1rem; border: 2px solid #06b6d4; }
 
       .btn-cyan { display: block; width: 100%; padding: 0.75rem; background-color: #06b6d4; color: #000; text-align: center; font-weight: 700; border-radius: 0.75rem; text-decoration: none; }
@@ -82,11 +78,11 @@
       </nav>
     </header>
 
-    <main class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col space-y-20" style="position:relative; z-index:10;">
+    <main class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col" style="gap: 5rem; position:relative; z-index:10;">
 
       <!-- Hero Section -->
       <section class="flex flex-col md:flex-row items-center justify-between gap-10">
-        <div class="space-y-6 text-right" style="max-width:38rem;">
+        <div style="display:flex; flex-direction:column; gap:1.5rem; text-align:right; max-width:38rem;">
           <div class="badge font-mono">
             <span class="pulse-dot"></span>
             <span>IT SYSTEM ADMINISTRATOR & NETWORK SPECIALIST</span>
@@ -137,7 +133,7 @@
       </section>
 
       <!-- תחומי התמחות -->
-      <section class="space-y-6">
+      <section style="display:flex; flex-direction:column; gap:1.5rem;">
         <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
           <h2 class="font-mono text-xs" style="color:#22d3ee; font-weight:bold;">// CORE IT & SYSTEM COMPETENCIES</h2>
           <span class="font-mono text-xs" style="color:#64748b;">תחומי התמחות בסיסטם</span>
@@ -183,13 +179,13 @@
       </section>
 
       <!-- ניסיון תעסוקתי -->
-      <section class="space-y-6">
+      <section style="display:flex; flex-direction:column; gap:1.5rem;">
         <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
           <h2 class="font-mono text-xs" style="color:#22d3ee; font-weight:bold;">// PROFESSIONAL EXPERIENCE</h2>
           <span class="font-mono text-xs" style="color:#64748b;">ניסיון תעסוקתי</span>
         </div>
 
-        <div class="space-y-4">
+        <div style="display:flex; flex-direction:column; gap:1rem;">
           <div class="card-bg p-6" style="display:flex; flex-direction:column; gap:0.5rem;">
             <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
               <h3 style="font-size:1.1rem; font-weight:bold; color:#fff;">System Administrator <span style="color:#22d3ee; font-weight:normal;">@ קבוצת קלי (Kali Group)</span></h3>
@@ -223,7 +219,7 @@
       </section>
 
       <!-- השכלה -->
-      <section class="space-y-6">
+      <section style="display:flex; flex-direction:column; gap:1.5rem;">
         <div class="flex justify-between items-center" style="border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
           <h2 class="font-mono text-xs" style="color:#22d3ee; font-weight:bold;">// EDUCATION & QUALIFICATIONS</h2>
           <span class="font-mono text-xs" style="color:#64748b;">השכלה והסמכות</span>
