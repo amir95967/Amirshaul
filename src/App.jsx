@@ -14,13 +14,14 @@ import {
   Terminal,
   Trash2,
   CheckCircle2,
-  Circle
+  Circle,
+  User,
+  Clock
 } from 'lucide-react';
 
 const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
 const SUPABASE_KEY = "sb_publishable_M2omv18OIuF5ulkLbDhh7g_P1m1OLgU";
 
-// Supabase REST Helper
 const db = {
   headers: {
     'apikey': SUPABASE_KEY,
@@ -28,17 +29,17 @@ const db = {
     'Content-Type': 'application/json',
     'Prefer': 'return=representation'
   },
-  async verifyPassword(inputPassword) {
+  async login(username, password) {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/app_config?key=eq.kali_pin&select=value`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/it_users?username=eq.${username.trim()}&password=eq.${password.trim()}&select=username,full_name`, {
         headers: this.headers
       });
-      if (!res.ok) return false;
+      if (!res.ok) return null;
       const data = await res.json();
-      return data.length > 0 && String(data[0].value).trim() === String(inputPassword).trim();
+      return data.length > 0 ? data[0] : null;
     } catch (err) {
-      console.error("Password verification failed:", err);
-      return false;
+      console.error(err);
+      return null;
     }
   },
   async getEmployees() {
@@ -90,21 +91,7 @@ const OFFBOARDING_TASKS = [
   'גיבוי קבצי OneDrive/מחשב מקומי'
 ];
 
-const iconsMap = {
-  Layout,
-  ShieldCheck,
-  ArrowUpRight,
-  Code2,
-  Mail,
-  HelpCircle,
-  Server,
-  Cloud,
-  Lock,
-  Cpu,
-  Database,
-  Terminal
-};
-
+const iconsMap = { Layout, ShieldCheck, ArrowUpRight, Code2, Mail, HelpCircle, Server, Cloud, Lock, Cpu, Database, Terminal };
 const SafeIcon = ({ name, size = 24, className = "" }) => {
   const IconComponent = iconsMap[name] || Code2;
   return <IconComponent size={size} className={className} />;
@@ -142,7 +129,8 @@ const EXPERIENCE = [
 
 export default function App() {
   const [isKaliRoute, setIsKaliRoute] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(false);
@@ -164,8 +152,9 @@ export default function App() {
     window.addEventListener('popstate', checkUrl);
     window.addEventListener('hashchange', checkUrl);
 
-    if (localStorage.getItem('kali_auth_session') === 'true') {
-      setIsAuthenticated(true);
+    const savedUser = localStorage.getItem('kali_current_user');
+    if (savedUser) {
+      try { setCurrentUser(JSON.parse(savedUser)); } catch (e) {}
     }
 
     return () => {
@@ -175,10 +164,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (isKaliRoute && isAuthenticated) {
+    if (isKaliRoute && currentUser) {
       loadEmployees();
     }
-  }, [isKaliRoute, isAuthenticated]);
+  }, [isKaliRoute, currentUser]);
 
   const loadEmployees = async () => {
     try {
@@ -189,7 +178,7 @@ export default function App() {
         email: u.email,
         department: u.department,
         type: u.type,
-        completed: Array.isArray(u.completed) ? u.completed : []
+        completed: (u.completed && typeof u.completed === 'object' && !Array.isArray(u.completed)) ? u.completed : {}
       }));
       setEmployees(formatted);
       if (!selectedId && formatted.length > 0) {
@@ -202,26 +191,26 @@ export default function App() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!passwordInput) return;
+    if (!usernameInput || !passwordInput) return;
     
     setIsCheckingAuth(true);
     setAuthError(false);
 
-    const isValid = await db.verifyPassword(passwordInput);
+    const user = await db.login(usernameInput, passwordInput);
     setIsCheckingAuth(false);
 
-    if (isValid) {
-      setIsAuthenticated(true);
+    if (user) {
+      setCurrentUser(user);
       setAuthError(false);
-      localStorage.setItem('kali_auth_session', 'true');
+      localStorage.setItem('kali_current_user', JSON.stringify(user));
     } else {
       setAuthError(true);
     }
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('kali_auth_session');
+    setCurrentUser(null);
+    localStorage.removeItem('kali_current_user');
   };
 
   const handleAddEmployee = async (e) => {
@@ -234,7 +223,7 @@ export default function App() {
       email: newEmail,
       department: newDept || 'כללי',
       type: newType,
-      completed: []
+      completed: {}
     };
 
     setEmployees([newEmp, ...employees]);
@@ -250,17 +239,26 @@ export default function App() {
     const currentEmp = employees.find(e => e.id === selectedId);
     if (!currentEmp) return;
 
-    const isCompleted = currentEmp.completed.includes(taskIndex);
-    const updatedCompleted = isCompleted
-      ? currentEmp.completed.filter(i => i !== taskIndex)
-      : [...currentEmp.completed, taskIndex];
+    const completedObj = { ...currentEmp.completed };
+    const taskKey = String(taskIndex);
+
+    if (completedObj[taskKey]) {
+      delete completedObj[taskKey];
+    } else {
+      const now = new Date();
+      const timeStr = `${now.getDate()}/${now.getMonth() + 1} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      completedObj[taskKey] = {
+        by: currentUser?.full_name || currentUser?.username || 'סיסטם',
+        at: timeStr
+      };
+    }
 
     const updatedEmployees = employees.map(emp => 
-      emp.id === selectedId ? { ...emp, completed: updatedCompleted } : emp
+      emp.id === selectedId ? { ...emp, completed: completedObj } : emp
     );
 
     setEmployees(updatedEmployees);
-    await db.updateTasks(selectedId, updatedCompleted);
+    await db.updateTasks(selectedId, completedObj);
   };
 
   const handleDeleteEmployee = async (id, e) => {
@@ -275,31 +273,38 @@ export default function App() {
 
   // ================= KALI VIEW =================
   if (isKaliRoute) {
-    if (!isAuthenticated) {
+    if (!currentUser) {
       return (
         <div className="min-h-screen bg-[#020617] text-slate-100 flex items-center justify-center p-4 font-sans" dir="rtl">
-          <form onSubmit={handleLogin} className="w-full max-w-sm bg-slate-900/80 border border-slate-800 rounded-3xl p-8 text-center space-y-6 shadow-2xl backdrop-blur-md">
-            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto text-2xl">
+          <form onSubmit={handleLogin} className="w-full max-w-sm bg-slate-900/80 border border-slate-800 rounded-3xl p-8 text-center space-y-4 shadow-2xl backdrop-blur-md">
+            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto text-2xl mb-2">
               <Lock size={28} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">כניסה למערכת IT</h2>
+              <h2 className="text-xl font-bold text-white">כניסת צוות IT</h2>
               <p className="font-mono text-xs text-slate-400 mt-1">Kali Group Boarding</p>
             </div>
+            <input 
+              type="text" 
+              value={usernameInput} 
+              onChange={(e) => setUsernameInput(e.target.value)} 
+              placeholder="שם משתמש" 
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-cyan-500"
+            />
             <input 
               type="password" 
               value={passwordInput} 
               onChange={(e) => setPasswordInput(e.target.value)} 
-              placeholder="הזן סיסמה" 
+              placeholder="סיסמה" 
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-cyan-500"
             />
-            {authError && <p className="text-xs text-rose-500">סיסמה שגויה, נסה שוב</p>}
+            {authError && <p className="text-xs text-rose-500">שם משתמש או סיסמה שגויים</p>}
             <button 
               type="submit" 
               disabled={isCheckingAuth}
-              className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] disabled:opacity-50"
+              className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] disabled:opacity-50 mt-2"
             >
-              {isCheckingAuth ? 'בודק סיסמה בענן...' : 'התחבר למערכת'}
+              {isCheckingAuth ? 'מאמת משתמש...' : 'התחבר למערכת'}
             </button>
           </form>
         </div>
@@ -314,10 +319,16 @@ export default function App() {
         {/* Sidebar */}
         <div className="w-full md:w-96 border-l border-slate-800 bg-slate-900/60 p-6 flex flex-col shrink-0">
           <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
-            <h1 className="font-mono text-base font-bold text-cyan-400 flex items-center gap-2">
-              <Terminal size={18} />
-              IT BOARDING
-            </h1>
+            <div>
+              <h1 className="font-mono text-base font-bold text-cyan-400 flex items-center gap-2">
+                <Terminal size={18} />
+                IT BOARDING
+              </h1>
+              <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 mt-0.5">
+                <User size={12} className="text-cyan-400" />
+                מחובר: <strong className="text-white">{currentUser.full_name}</strong>
+              </span>
+            </div>
             <button onClick={handleLogout} className="font-mono text-xs text-rose-400 hover:text-rose-300">
               יציאה
             </button>
@@ -367,7 +378,8 @@ export default function App() {
               employees.map(emp => {
                 const isOff = emp.type === 'offboarding';
                 const total = isOff ? OFFBOARDING_TASKS.length : ONBOARDING_TASKS.length;
-                const prog = Math.round((emp.completed.length / total) * 100);
+                const completedCount = Object.keys(emp.completed || {}).length;
+                const prog = Math.round((completedCount / total) * 100);
                 const isSelected = emp.id === selectedId;
 
                 return (
@@ -423,21 +435,36 @@ export default function App() {
               </div>
 
               <div className="space-y-3">
-                <h3 className="font-mono text-xs text-cyan-400 font-bold">// צ'ק-ליסט משימות סיסטם:</h3>
+                <h3 className="font-mono text-xs text-cyan-400 font-bold">// צ'ק-ליסט משימות סיסטם & Audit Log:</h3>
                 {activeTasks.map((task, idx) => {
-                  const isDone = selectedEmployee.completed.includes(idx);
+                  const taskLog = selectedEmployee.completed?.[String(idx)];
+                  const isDone = !!taskLog;
+
                   return (
                     <div 
                       key={idx} 
                       onClick={() => handleToggleTask(idx)}
-                      className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer select-none ${
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all cursor-pointer select-none gap-2 ${
                         isDone 
-                          ? 'bg-slate-950/30 border-slate-800 text-slate-500 line-through' 
+                          ? 'bg-slate-950/40 border-slate-800/80 text-slate-400' 
                           : 'bg-slate-900/50 border-slate-800 text-slate-200 hover:border-cyan-500/40'
                       }`}
                     >
-                      <span className="text-xs sm:text-sm">{task}</span>
-                      {isDone ? <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> : <Circle size={18} className="text-slate-600 shrink-0" />}
+                      <div className="flex items-center gap-3">
+                        {isDone ? <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> : <Circle size={18} className="text-slate-600 shrink-0" />}
+                        <span className={`text-xs sm:text-sm ${isDone ? 'line-through text-slate-400' : ''}`}>{task}</span>
+                      </div>
+
+                      {isDone && (
+                        <div className="flex items-center gap-2 font-mono text-[11px] bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg self-start sm:self-auto">
+                          <span className="text-cyan-400 font-bold">👤 {taskLog.by}</span>
+                          <span className="text-slate-500">•</span>
+                          <span className="text-slate-400 flex items-center gap-1">
+                            <Clock size={11} />
+                            {taskLog.at}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -468,20 +495,10 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-4 font-mono text-xs">
-          <a 
-            href="https://www.linkedin.com/in/amir-shaul/" 
-            target="_blank" 
-            rel="noreferrer" 
-            className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
-          >
+          <a href="https://www.linkedin.com/in/amir-shaul/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5">
             <span>LinkedIn</span>
           </a>
-          <a 
-            href="https://form.amirshaul.online" 
-            target="_blank" 
-            rel="noreferrer" 
-            className="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold hover:bg-cyan-500 hover:text-black transition-all shadow-[0_0_15px_rgba(6,182,212,0.15)]"
-          >
+          <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" className="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold hover:bg-cyan-500 hover:text-black transition-all shadow-[0_0_15px_rgba(6,182,212,0.15)]">
             יצירת קשר / Contact
           </a>
         </div>
@@ -550,12 +567,7 @@ export default function App() {
               <p><span className="text-slate-500">Location:</span> Holon / Tel Aviv</p>
             </div>
 
-            <a 
-              href="https://form.amirshaul.online" 
-              target="_blank" 
-              rel="noreferrer" 
-              className="block w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black text-center font-mono text-xs font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-            >
+            <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" className="block w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black text-center font-mono text-xs font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               SEND MESSAGE // צור קשר
             </a>
           </aside>
@@ -627,12 +639,7 @@ export default function App() {
             זמין להובלת תשתיות IT, ענן וניהול רשתות באזור המרכז ותל אביב (היברידי או On-site).
           </p>
           <div className="flex items-center gap-3 font-mono text-xs">
-            <a 
-              href="https://form.amirshaul.online" 
-              target="_blank" 
-              rel="noreferrer" 
-              className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-full transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-            >
+            <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-full transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               יצירת קשר / Contact Form
             </a>
           </div>
