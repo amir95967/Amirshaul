@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { 
   Layout, 
   Code2, 
@@ -20,9 +19,46 @@ import {
 
 const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
 const SUPABASE_KEY = "sb_publishable_M2omv18OIuF5ulkLbDhh7g_P1m1OLgU";
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const KALI_PASSWORD = "123456";
+
+// Supabase REST Helper
+const db = {
+  headers: {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  },
+  async getEmployees() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/employees?select=*&order=created_at.desc`, {
+      headers: this.headers
+    });
+    return res.ok ? await res.json() : [];
+  },
+  async addEmployee(emp) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/employees`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(emp)
+    });
+    return res.ok;
+  },
+  async updateTasks(id, completed) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/employees?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: this.headers,
+      body: JSON.stringify({ completed })
+    });
+    return res.ok;
+  },
+  async deleteEmployee(id) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/employees?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: this.headers
+    });
+    return res.ok;
+  }
+};
 
 const ONBOARDING_TASKS = [
   'פתיחת משתמש ב-Active Directory / 365',
@@ -98,7 +134,6 @@ export default function App() {
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState(false);
 
-  // Kali Dashboard States
   const [employees, setEmployees] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [newName, setNewName] = useState('');
@@ -134,8 +169,7 @@ export default function App() {
 
   const loadEmployees = async () => {
     try {
-      const { data, error } = await supabase.from('employees').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
+      const data = await db.getEmployees();
       const formatted = (data || []).map(u => ({
         id: u.id,
         name: u.name,
@@ -188,7 +222,7 @@ export default function App() {
     setNewEmail('');
     setNewDept('');
 
-    await supabase.from('employees').insert([newEmp]);
+    await db.addEmployee(newEmp);
   };
 
   const handleToggleTask = async (taskIndex) => {
@@ -205,7 +239,7 @@ export default function App() {
     );
 
     setEmployees(updatedEmployees);
-    await supabase.from('employees').update({ completed: updatedCompleted }).eq('id', selectedId);
+    await db.updateTasks(selectedId, updatedCompleted);
   };
 
   const handleDeleteEmployee = async (id, e) => {
@@ -215,7 +249,7 @@ export default function App() {
     if (selectedId === id) {
       setSelectedId(updated[0]?.id || null);
     }
-    await supabase.from('employees').delete().eq('id', id);
+    await db.deleteEmployee(id);
   };
 
   // ================= KALI VIEW =================
