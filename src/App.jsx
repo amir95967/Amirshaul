@@ -125,33 +125,33 @@ function HomePage() {
             </p>
 
             <div className="flex justify-center space-x-8 items-center">
-               <a href="https://github.com/amirshaul" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors flex items-center space-x-2 no-underline">
-                 <SafeIcon name="Github" size={20} />
-                 <span className="text-xs font-black tracking-widest uppercase">Code</span>
-               </a>
-               
-               <div className="w-px h-4 bg-white/10 self-center" />
+              <a href="https://github.com/amirshaul" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors flex items-center space-x-2 no-underline">
+                <SafeIcon name="Github" size={20} />
+                <span className="text-xs font-black tracking-widest uppercase">Code</span>
+              </a>
+              
+              <div className="w-px h-4 bg-white/10 self-center" />
 
-               <motion.a 
-                 href="https://form.amirshaul.online" 
-                 className="text-cyan-400 flex items-center space-x-2 no-underline"
-                 animate={{ opacity: [0.4, 1, 0.4] }}
-                 transition={{ 
-                   duration: 3, 
-                   repeat: Infinity, 
-                   ease: "easeInOut" 
-                 }}
-               >
-                 <SafeIcon name="Mail" size={20} />
-                 <span className="text-xs font-black tracking-widest uppercase">Contact</span>
-               </motion.a>
+              <motion.a 
+                href="https://form.amirshaul.online" 
+                className="text-cyan-400 flex items-center space-x-2 no-underline"
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              >
+                <SafeIcon name="Mail" size={20} />
+                <span className="text-xs font-black tracking-widest uppercase">Contact</span>
+              </motion.a>
 
-               <div className="w-px h-4 bg-white/10 self-center" />
+              <div className="w-px h-4 bg-white/10 self-center" />
 
-               <div className="text-cyan-400 flex items-center space-x-2">
-                 <SafeIcon name="ShieldCheck" size={20} />
-                 <span className="text-xs font-black tracking-widest uppercase text-slate-400">Verified</span>
-               </div>
+              <div className="text-cyan-400 flex items-center space-x-2">
+                <SafeIcon name="ShieldCheck" size={20} />
+                <span className="text-xs font-black tracking-widest uppercase text-slate-400">Verified</span>
+              </div>
             </div>
           </div>
         </section>
@@ -187,22 +187,33 @@ function HomePage() {
 }
 
 export default function App() {
-  const [pathname, setPathname] = useState(
-    typeof window !== 'undefined' ? window.location.pathname : '/'
-  );
+  const [isKaliRoute, setIsKaliRoute] = useState(false);
 
   useEffect(() => {
-    const handleLocationChange = () => {
-      setPathname(window.location.pathname);
+    const checkRoute = () => {
+      const path = (window.location.pathname || '').toLowerCase();
+      const hash = (window.location.hash || '').toLowerCase();
+      const search = (window.location.search || '').toLowerCase();
+
+      const matched = 
+        path.includes('kali') || 
+        hash.includes('kali') || 
+        search.includes('kali');
+
+      setIsKaliRoute(matched);
     };
 
-    window.addEventListener('popstate', handleLocationChange);
-    return () => window.removeEventListener('popstate', handleLocationChange);
+    checkRoute();
+    window.addEventListener('popstate', checkRoute);
+    window.addEventListener('hashchange', checkRoute);
+
+    return () => {
+      window.removeEventListener('popstate', checkRoute);
+      window.removeEventListener('hashchange', checkRoute);
+    };
   }, []);
 
-  // בודק אם הכתובת היא /kali
-  const cleanPath = pathname.toLowerCase().replace(/\/$/, '');
-  if (cleanPath === '/kali') {
+  if (isKaliRoute) {
     return <KaliDashboard />;
   }
 
