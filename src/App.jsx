@@ -19,7 +19,6 @@ import {
 
 const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
 const SUPABASE_KEY = "sb_publishable_M2omv18OIuF5ulkLbDhh7g_P1m1OLgU";
-const KALI_PASSWORD = "123456";
 
 // Supabase REST Helper
 const db = {
@@ -28,6 +27,19 @@ const db = {
     'Authorization': `Bearer ${SUPABASE_KEY}`,
     'Content-Type': 'application/json',
     'Prefer': 'return=representation'
+  },
+  async verifyPassword(inputPassword) {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/app_config?key=eq.kali_pin&select=value`, {
+        headers: this.headers
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      return data.length > 0 && String(data[0].value).trim() === String(inputPassword).trim();
+    } catch (err) {
+      console.error("Password verification failed:", err);
+      return false;
+    }
   },
   async getEmployees() {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/employees?select=*&order=created_at.desc`, {
@@ -133,6 +145,7 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(false);
 
   const [employees, setEmployees] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -187,9 +200,17 @@ export default function App() {
     }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (passwordInput === KALI_PASSWORD) {
+    if (!passwordInput) return;
+    
+    setIsCheckingAuth(true);
+    setAuthError(false);
+
+    const isValid = await db.verifyPassword(passwordInput);
+    setIsCheckingAuth(false);
+
+    if (isValid) {
       setIsAuthenticated(true);
       setAuthError(false);
       localStorage.setItem('kali_auth_session', 'true');
@@ -273,8 +294,12 @@ export default function App() {
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-cyan-500"
             />
             {authError && <p className="text-xs text-rose-500">סיסמה שגויה, נסה שוב</p>}
-            <button type="submit" className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-              התחבר למערכת
+            <button 
+              type="submit" 
+              disabled={isCheckingAuth}
+              className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] disabled:opacity-50"
+            >
+              {isCheckingAuth ? 'בודק סיסמה בענן...' : 'התחבר למערכת'}
             </button>
           </form>
         </div>
