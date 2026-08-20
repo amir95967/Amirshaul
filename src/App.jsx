@@ -7,7 +7,6 @@ import {
   ShieldCheck, 
   ArrowUpRight, 
   Mail, 
-  Github,
   Server,
   Cloud,
   Lock,
@@ -18,7 +17,6 @@ import {
 
 const iconsMap = {
   Layout,
-  Github,
   ShieldCheck,
   ArrowUpRight,
   Code2,
