@@ -26,7 +26,12 @@ import {
   Users,
   CheckCircle,
   AlertCircle,
-  X
+  X,
+  Edit2,
+  Boxes,
+  ShieldAlert,
+  KeyRound,
+  Filter
 } from 'lucide-react';
 
 const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
@@ -41,7 +46,7 @@ const db = {
   },
   async login(username, password) {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/it_users?username=eq.${username.trim()}&password=eq.${password.trim()}&select=username,full_name`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/it_users?username=eq.${username.trim()}&password=eq.${password.trim()}&select=id,username,full_name`, {
         headers: this.headers
       });
       if (!res.ok) return null;
@@ -51,6 +56,35 @@ const db = {
       console.error(err);
       return null;
     }
+  },
+  async getITUsers() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/it_users?select=*&order=created_at.desc`, {
+      headers: this.headers
+    });
+    return res.ok ? await res.json() : [];
+  },
+  async addITUser(user) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/it_users`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(user)
+    });
+    return res.ok;
+  },
+  async updateITUser(id, payload) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/it_users?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: this.headers,
+      body: JSON.stringify(payload)
+    });
+    return res.ok;
+  },
+  async deleteITUser(id) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/it_users?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: this.headers
+    });
+    return res.ok;
   },
   async getEmployees() {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/employees?select=*&order=created_at.desc`, {
@@ -80,6 +114,35 @@ const db = {
       headers: this.headers
     });
     return res.ok;
+  },
+  async getInventory() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/inventory_items?select=*&order=date_added.desc`, {
+      headers: this.headers
+    });
+    return res.ok ? await res.json() : [];
+  },
+  async addInventoryBatch(items) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/inventory_items`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(items)
+    });
+    return res.ok;
+  },
+  async updateInventoryItem(id, payload) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/inventory_items?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: this.headers,
+      body: JSON.stringify(payload)
+    });
+    return res.ok;
+  },
+  async deleteInventoryItem(id) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/inventory_items?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: this.headers
+    });
+    return res.ok;
   }
 };
 
@@ -100,6 +163,45 @@ const DEFAULT_OFFBOARDING_TASKS = [
   'איסוף מחשב וציוד היקפי וביטול שיוך ב-MDM',
   'גיבוי קבצי OneDrive ומחשב מקומי לארכיון'
 ];
+
+const DEPARTMENT_TEMPLATES = {
+  'כספים': [
+    'פתיחת משתמש ב-Active Directory / Entra ID',
+    'שיוך רישיונות Microsoft 365 Business Premium',
+    'הרשאות כניסה למערכת SAP / Priority',
+    'הרשאת גישה לתיקיית רשת כספים והנהלת חשבונות',
+    'התקנת מחשב נייד עם מסך כפול וחיבור VPN מאובטח',
+    'הגדרת אימות רב-שלבי (MFA)'
+  ],
+  'מערכות מידע': [
+    'פתיחת משתמש AD בעל הרשאות Admin ייעודיות',
+    'שיוך רישיון M365 E5 / Business Premium',
+    'הגדרת גישת AWS Console / IAM / VPN ייעודי',
+    'הקצאת מחשב נייד ייעודי לפיתוח וסיסטם',
+    'הרשאות גישה לשרתי RDS, Exchange ו-Domain Controllers'
+  ],
+  'קלי פרימיום': [
+    'פתיחת משתמש ב-Active Directory / Entra ID',
+    'שיוך רישיונות Microsoft 365',
+    'הרשאה לתיקיות לקוחות פרימיום ומערכות ניהול תיקים',
+    'הכנת מחשב נייד מנהלי תיקים, עכבר ומטען',
+    'הגדרת חיבור דואר Exchange בסמארטפון'
+  ],
+  'שירות לקוחות': [
+    'פתיחת משתמש ב-Active Directory / Entra ID',
+    'שיוך רישיונות M365 ותוכנת טלפוניה / מרכזייה',
+    'הוספה לקבוצת תפוצה Moked@kali.co.il',
+    'הכנת עמדת עבודה, מחשב ואוזניות מוקד',
+    'הגדרת גישה למערכת CRM'
+  ],
+  'משאבי אנוש': [
+    'פתיחת משתמש ב-Active Directory / Entra ID',
+    'שיוך רישיונות Microsoft 365',
+    'הרשאה לתיקיית משאבי אנוש ושכר',
+    'הכנת מחשב נייד והגדרת VPN',
+    'הוספה לקבוצת תפוצה Hr@kali.co.il'
+  ]
+};
 
 const iconsMap = { Layout, ShieldCheck, ArrowUpRight, Code2, Mail, HelpCircle, Server, Cloud, Lock, Cpu, Database, Terminal };
 const SafeIcon = ({ name, size = 24, className = "" }) => {
@@ -149,13 +251,33 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'in_progress', 'completed'
-  const [showGlobalAssetsModal, setShowGlobalAssetsModal] = useState(false);
-  
+  const [deptFilter, setDeptFilter] = useState('all');
+
+  // Modals
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [showEditEmployeeModal, setShowEditEmployeeModal] = useState(false);
+
+  // IT Users Management
+  const [itUsersList, setItUsersList] = useState([]);
+  const [newITUser, setNewITUser] = useState({ username: '', full_name: '', password: '' });
+
+  // Inventory Pool
+  const [inventoryList, setInventoryList] = useState([]);
+  const [inventoryFilter, setInventoryFilter] = useState('all'); // 'all', 'in_stock', 'assigned', 'returned'
+  const [newBatchItem, setNewBatchItem] = useState('מחשב נייד Dell Latitude');
+  const [newBatchCategory, setNewBatchCategory] = useState('מחשב נייד');
+  const [newBatchQty, setNewBatchQty] = useState(1);
+  const [newBatchPrefix, setNewBatchPrefix] = useState('KALI-');
+
+  // Edit Employee Form
+  const [editForm, setEditForm] = useState({ name: '', email: '', department: '', role: '', manager: '', target_date: '' });
+
   // New Employee Form
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
-  const [newDept, setNewDept] = useState('');
+  const [newDept, setNewDept] = useState('כללי');
   const [newRole, setNewRole] = useState('');
   const [newManager, setNewManager] = useState('');
   const [newTargetDate, setNewTargetDate] = useState('');
@@ -192,6 +314,8 @@ export default function App() {
   useEffect(() => {
     if (isKaliRoute && currentUser) {
       loadEmployees();
+      loadInventory();
+      loadITUsers();
     }
   }, [isKaliRoute, currentUser]);
 
@@ -200,7 +324,7 @@ export default function App() {
       const data = await db.getEmployees();
       const formatted = (data || []).map(u => {
         const isOff = u.type === 'offboarding';
-        const defaultTasks = isOff ? DEFAULT_OFFBOARDING_TASKS : DEFAULT_ONBOARDING_TASKS;
+        const defaultTasks = isOff ? DEFAULT_OFFBOARDING_TASKS : (DEPARTMENT_TEMPLATES[u.department] || DEFAULT_ONBOARDING_TASKS);
         const initialTasks = (Array.isArray(u.custom_tasks) && u.custom_tasks.length > 0) ? u.custom_tasks : defaultTasks;
         
         return {
@@ -222,6 +346,24 @@ export default function App() {
       if (!selectedId && formatted.length > 0) {
         setSelectedId(formatted[0].id);
       }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadInventory = async () => {
+    try {
+      const data = await db.getInventory();
+      setInventoryList(data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadITUsers = async () => {
+    try {
+      const data = await db.getITUsers();
+      setItUsersList(data || []);
     } catch (err) {
       console.error(err);
     }
@@ -255,7 +397,9 @@ export default function App() {
     e.preventDefault();
     if (!newName || !newEmail) return;
 
-    const initialTasks = newType === 'offboarding' ? [...DEFAULT_OFFBOARDING_TASKS] : [...DEFAULT_ONBOARDING_TASKS];
+    const initialTasks = newType === 'offboarding' 
+      ? [...DEFAULT_OFFBOARDING_TASKS] 
+      : [...(DEPARTMENT_TEMPLATES[newDept] || DEFAULT_ONBOARDING_TASKS)];
 
     const newEmp = {
       id: Date.now().toString(),
@@ -276,13 +420,54 @@ export default function App() {
     setSelectedId(newEmp.id);
     setNewName('');
     setNewEmail('');
-    setNewDept('');
+    setNewDept('כללי');
     setNewRole('');
     setNewManager('');
     setNewTargetDate('');
     setShowAddForm(false);
 
     await db.addEmployee(newEmp);
+  };
+
+  const openEditEmployeeModal = (emp) => {
+    setEditForm({
+      name: emp.name,
+      email: emp.email,
+      department: emp.department,
+      role: emp.role,
+      manager: emp.manager,
+      target_date: emp.target_date
+    });
+    setShowEditEmployeeModal(true);
+  };
+
+  const handleSaveEditEmployee = async (e) => {
+    e.preventDefault();
+    const currentEmp = employees.find(e => e.id === selectedId);
+    if (!currentEmp) return;
+
+    const updatedEmp = {
+      ...currentEmp,
+      name: editForm.name,
+      email: editForm.email,
+      department: editForm.department,
+      role: editForm.role,
+      manager: editForm.manager,
+      target_date: editForm.target_date
+    };
+
+    const updatedEmployees = employees.map(emp => emp.id === selectedId ? updatedEmp : emp);
+    setEmployees(updatedEmployees);
+    setShowEditEmployeeModal(false);
+
+    await db.updateEmployee(selectedId, {
+      name: editForm.name,
+      email: editForm.email,
+      department: editForm.department,
+      role: editForm.role,
+      manager: editForm.manager,
+      target_date: editForm.target_date
+    });
   };
 
   // Helper to check task completion (supports index or task title)
@@ -371,6 +556,119 @@ export default function App() {
 
     setEmployees(updatedEmployees);
     await db.updateEmployee(selectedId, { custom_tasks: updatedTasks, completed: updatedCompleted });
+  };
+
+  // Inventory Pool Operations
+  const handleAddInventoryBatch = async (e) => {
+    e.preventDefault();
+    const count = parseInt(newBatchQty) || 1;
+    const now = new Date().toLocaleDateString('he-IL');
+    const newItems = [];
+
+    for (let i = 0; i < count; i++) {
+      const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+      const serial = `${newBatchPrefix || 'SN-'}${randomSuffix}`;
+      newItems.push({
+        id: `inv_${Date.now()}_${i}`,
+        item: newBatchItem,
+        category: newBatchCategory,
+        serial: serial,
+        status: 'in_stock',
+        assigned_to_id: null,
+        assigned_to_name: null,
+        assigned_by: currentUser?.full_name || 'IT',
+        date_added: now,
+        notes: ''
+      });
+    }
+
+    setInventoryList([...newItems, ...inventoryList]);
+    await db.addInventoryBatch(newItems);
+    alert(`נוספו בהצלחה ${count} פריטים למלאי!`);
+  };
+
+  const handleAssignInventoryToEmployee = async (invItem, emp) => {
+    if (!emp) return;
+    const now = new Date().toLocaleDateString('he-IL');
+
+    // 1. Update inventory item
+    const updatedInv = inventoryList.map(item => item.id === invItem.id ? {
+      ...item,
+      status: 'assigned',
+      assigned_to_id: emp.id,
+      assigned_to_name: emp.name
+    } : item);
+    setInventoryList(updatedInv);
+    await db.updateInventoryItem(invItem.id, {
+      status: 'assigned',
+      assigned_to_id: emp.id,
+      assigned_to_name: emp.name
+    });
+
+    // 2. Add to employee assets
+    const newAsset = {
+      id: invItem.id,
+      item: invItem.item,
+      serial: invItem.serial,
+      assigned_by: currentUser?.full_name || 'IT',
+      date: now
+    };
+    const updatedAssets = [...(emp.assets || []), newAsset];
+    const updatedEmployees = employees.map(e => e.id === emp.id ? { ...e, assets: updatedAssets } : e);
+    setEmployees(updatedEmployees);
+    await db.updateEmployee(emp.id, { assets: updatedAssets });
+
+    alert(`הציוד (${invItem.item}) שויך בהצלחה לעובד/ת: ${emp.name}`);
+  };
+
+  const handleReturnInventoryItem = async (invId) => {
+    const updatedInv = inventoryList.map(item => item.id === invId ? {
+      ...item,
+      status: 'returned',
+      assigned_to_id: null,
+      assigned_to_name: null
+    } : item);
+    setInventoryList(updatedInv);
+    await db.updateInventoryItem(invId, {
+      status: 'returned',
+      assigned_to_id: null,
+      assigned_to_name: null
+    });
+  };
+
+  const handleDeleteInventoryItem = async (invId) => {
+    if (!confirm('האם למחוק פריט זה ממאגר המלאי?')) return;
+    setInventoryList(inventoryList.filter(item => item.id !== invId));
+    await db.deleteInventoryItem(invId);
+  };
+
+  // IT Users Management
+  const handleAddITUser = async (e) => {
+    e.preventDefault();
+    if (!newITUser.username || !newITUser.password || !newITUser.full_name) return;
+
+    const userObj = {
+      username: newITUser.username.trim(),
+      full_name: newITUser.full_name.trim(),
+      password: newITUser.password.trim()
+    };
+
+    const res = await db.addITUser(userObj);
+    if (res) {
+      setItUsersList([userObj, ...itUsersList]);
+      setNewITUser({ username: '', full_name: '', password: '' });
+      alert(`משתמש IT ${userObj.full_name} נוסף בהצלחה!`);
+    }
+  };
+
+  const handleDeleteITUser = async (id, username) => {
+    if (username === currentUser?.username) {
+      alert('לא ניתן למחוק את המשתמש שמחובר כעת');
+      return;
+    }
+    if (!confirm(`האם למחוק את משתמש ה-IT ${username}?`)) return;
+    setItUsersList(itUsersList.filter(u => u.id !== id));
+    await db.deleteITUser(id);
   };
 
   const handleAddAsset = async (e) => {
@@ -474,22 +772,14 @@ export default function App() {
   // Metrics Calculations
   const totalEmployeesCount = employees.length;
   let completedProcessesCount = 0;
-  let allIssuedAssetsList = [];
-
   employees.forEach(emp => {
     const { isDone } = getEmployeeProgress(emp);
     if (isDone) completedProcessesCount++;
-    (emp.assets || []).forEach(a => {
-      allIssuedAssetsList.push({
-        ...a,
-        employeeName: emp.name,
-        employeeEmail: emp.email,
-        employeeDept: emp.department
-      });
-    });
   });
-
   const inProgressCount = totalEmployeesCount - completedProcessesCount;
+
+  // Unique departments for filter dropdown
+  const departmentOptions = Array.from(new Set(employees.map(e => e.department).filter(Boolean)));
 
   // Filtered employees list
   const filteredEmployees = employees.filter(emp => {
@@ -499,11 +789,20 @@ export default function App() {
       emp.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
       emp.role.toLowerCase().includes(searchQuery.toLowerCase());
 
+    const matchesDept = deptFilter === 'all' || emp.department === deptFilter;
     const { isDone } = getEmployeeProgress(emp);
 
-    if (statusFilter === 'in_progress') return matchesSearch && !isDone;
-    if (statusFilter === 'completed') return matchesSearch && isDone;
-    return matchesSearch;
+    if (statusFilter === 'in_progress') return matchesSearch && matchesDept && !isDone;
+    if (statusFilter === 'completed') return matchesSearch && matchesDept && isDone;
+    return matchesSearch && matchesDept;
+  });
+
+  // Filtered Inventory list
+  const filteredInventory = inventoryList.filter(item => {
+    if (inventoryFilter === 'in_stock') return item.status === 'in_stock';
+    if (inventoryFilter === 'assigned') return item.status === 'assigned';
+    if (inventoryFilter === 'returned') return item.status === 'returned';
+    return true;
   });
 
   // ================= KALI VIEW =================
@@ -569,11 +868,14 @@ export default function App() {
                 מחובר: <strong className="text-white">{currentUser.full_name}</strong>
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <button onClick={() => setShowAdminModal(true)} title="ניהול משתמשי IT" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 transition-colors">
+                <KeyRound size={15} />
+              </button>
               <button onClick={handleExportCSV} title="ייצוא לאקסל (CSV)" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">
                 <Download size={15} />
               </button>
-              <button onClick={handleLogout} className="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20 font-bold transition-colors">
+              <button onClick={handleLogout} className="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 px-2.5 py-1.5 rounded-lg border border-rose-500/20 font-bold transition-colors">
                 יציאה
               </button>
             </div>
@@ -599,6 +901,21 @@ export default function App() {
                 <Plus size={16} />
                 <span>{showAddForm ? 'סגור' : 'חדש'}</span>
               </button>
+            </div>
+
+            {/* Department Filter Dropdown */}
+            <div className="flex items-center gap-2">
+              <Filter size={13} className="text-slate-400 shrink-0" />
+              <select 
+                value={deptFilter} 
+                onChange={e => setDeptFilter(e.target.value)} 
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-cyan-500 font-medium"
+              >
+                <option value="all">כל המחלקות (הצג הכל)</option>
+                {departmentOptions.map((d, i) => (
+                  <option key={i} value={d}>{d}</option>
+                ))}
+              </select>
             </div>
 
             {/* Filter Tabs */}
@@ -646,13 +963,21 @@ export default function App() {
                 className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
               />
               <div className="grid grid-cols-2 gap-2">
-                <input 
-                  type="text" 
-                  placeholder="מחלקה" 
+                <select 
                   value={newDept} 
                   onChange={e => setNewDept(e.target.value)} 
                   className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
-                />
+                >
+                  <option value="כללי">מחלקה: כללי</option>
+                  <option value="כספים">כספים</option>
+                  <option value="מערכות מידע">מערכות מידע</option>
+                  <option value="קלי פרימיום">קלי פרימיום</option>
+                  <option value="שירות לקוחות">שירות לקוחות</option>
+                  <option value="משאבי אנוש">משאבי אנוש</option>
+                  <option value="שיווק">שיווק</option>
+                  <option value="קליטת לקוחות">קליטת לקוחות</option>
+                  <option value="גבייה">גבייה</option>
+                </select>
                 <input 
                   type="text" 
                   placeholder="תפקיד" 
@@ -685,7 +1010,7 @@ export default function App() {
                 <option value="offboarding">🛑 תהליך עזיבה (Offboarding)</option>
               </select>
               <button type="submit" className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-lg transition-all shadow-md">
-                + שמור עובד למערכת
+                + שמור עובד למערכת (טען תבנית מחלקה)
               </button>
             </form>
           )}
@@ -791,15 +1116,15 @@ export default function App() {
             </div>
 
             <div 
-              onClick={() => setShowGlobalAssetsModal(true)} 
+              onClick={() => setShowInventoryModal(true)} 
               className="bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5 cursor-pointer transition-all hover:border-blue-500/40"
             >
               <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
-                <Laptop size={22} />
+                <Boxes size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-medium">ציוד שנופק (צפה)</p>
-                <h3 className="text-xl font-bold text-white mt-0.5">{allIssuedAssetsList.length}</h3>
+                <p className="text-xs text-slate-400 font-medium">מאגר מלאי וציוד (פתח)</p>
+                <h3 className="text-xl font-bold text-white mt-0.5">{inventoryList.length}</h3>
               </div>
             </div>
           </div>
@@ -807,7 +1132,7 @@ export default function App() {
           {selectedEmployee ? (
             <div className="max-w-3xl mx-auto space-y-6 pt-2">
               
-              {/* Header Box */}
+              {/* Header Box with Edit Button */}
               <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-3">
@@ -827,10 +1152,18 @@ export default function App() {
                     )}
                   </div>
                   <p className="text-xs text-slate-400 mt-1.5 font-medium leading-relaxed">
-                    {selectedEmployee.email} | מחלקה: {selectedEmployee.department} | תפקיד: {selectedEmployee.role}
+                    {selectedEmployee.email} | מחלקה: <strong className="text-slate-200">{selectedEmployee.department}</strong> | תפקיד: <strong className="text-slate-200">{selectedEmployee.role}</strong>
                     {selectedEmployee.manager && ` | מנהל: ${selectedEmployee.manager}`}
                   </p>
                 </div>
+
+                <button 
+                  onClick={() => openEditEmployeeModal(selectedEmployee)} 
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all self-start sm:self-auto"
+                >
+                  <Edit2 size={13} className="text-cyan-400" />
+                  <span>ערוך פרטים</span>
+                </button>
               </div>
 
               {/* Navigation Tabs */}
@@ -923,10 +1256,21 @@ export default function App() {
               {/* Tab 2: Assets */}
               {activeTab === 'assets' && (
                 <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row gap-2 justify-between items-center bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
+                    <span className="text-xs text-slate-300 font-medium">באפשרותך לשייך ציוד ישירות ממאגר המלאי הכללי או להזין פריט ידנית:</span>
+                    <button 
+                      onClick={() => setShowInventoryModal(true)} 
+                      className="px-3.5 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-bold rounded-xl border border-blue-500/30 flex items-center gap-1"
+                    >
+                      <Boxes size={14} />
+                      פתח מאגר מלאי לשיוך
+                    </button>
+                  </div>
+
                   <form onSubmit={handleAddAsset} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-2">
                     <input 
                       type="text" 
-                      placeholder="שם הפריט (למשל: Dell Latitude 5440 / מסך 27 אינץ')" 
+                      placeholder="שם הפריט ידנית (למשל: Dell Latitude 5440 / מסך 27 אינץ')" 
                       value={newAssetItem} 
                       onChange={e => setNewAssetItem(e.target.value)} 
                       className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
@@ -1007,44 +1351,238 @@ export default function App() {
           )}
         </div>
 
-        {/* Global Assets Modal (When clicking on Top Metric) */}
-        {showGlobalAssetsModal && (
+        {/* Edit Employee Modal */}
+        {showEditEmployeeModal && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-3xl p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
+            <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <Edit2 size={16} className="text-cyan-400" />
+                  עריכת פרטי עובד/ת
+                </h2>
+                <button onClick={() => setShowEditEmployeeModal(false)} className="text-slate-400 hover:text-white">
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEditEmployee} className="space-y-3">
+                <div>
+                  <label className="text-xs text-slate-400 font-medium block mb-1">שם מלא:</label>
+                  <input 
+                    type="text" 
+                    value={editForm.name} 
+                    onChange={e => setEditForm({ ...editForm, name: e.target.value })} 
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-400 font-medium block mb-1">כתובת מייל:</label>
+                  <input 
+                    type="email" 
+                    value={editForm.email} 
+                    onChange={e => setEditForm({ ...editForm, email: e.target.value })} 
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs text-slate-400 font-medium block mb-1">מחלקה:</label>
+                    <input 
+                      type="text" 
+                      value={editForm.department} 
+                      onChange={e => setEditForm({ ...editForm, department: e.target.value })} 
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500" 
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-400 font-medium block mb-1">תפקיד:</label>
+                    <input 
+                      type="text" 
+                      value={editForm.role} 
+                      onChange={e => setEditForm({ ...editForm, role: e.target.value })} 
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500" 
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs text-slate-400 font-medium block mb-1">מנהל ישיר:</label>
+                    <input 
+                      type="text" 
+                      value={editForm.manager} 
+                      onChange={e => setEditForm({ ...editForm, manager: e.target.value })} 
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500" 
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-400 font-medium block mb-1">תאריך יעד:</label>
+                    <input 
+                      type="date" 
+                      value={editForm.target_date} 
+                      onChange={e => setEditForm({ ...editForm, target_date: e.target.value })} 
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-cyan-500" 
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-800 flex justify-end gap-2">
+                  <button type="button" onClick={() => setShowEditEmployeeModal(false)} className="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">
+                    ביטול
+                  </button>
+                  <button type="submit" className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded-xl">
+                    שמור שינויים
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Inventory Pool Modal */}
+        {showInventoryModal && (
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-slate-800 w-full max-w-5xl rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="flex items-center gap-2 text-cyan-400 font-bold">
-                  <Laptop size={20} />
-                  <h2 className="text-lg text-white">ריכוז ציוד וחומרה שנופקו בארגון ({allIssuedAssetsList.length})</h2>
+                  <Boxes size={22} />
+                  <h2 className="text-lg text-white">מאגר מלאי וחומרה ארגונית ({inventoryList.length})</h2>
                 </div>
-                <button onClick={() => setShowGlobalAssetsModal(false)} className="text-slate-400 hover:text-white p-1 rounded-lg">
+                <button onClick={() => setShowInventoryModal(false)} className="text-slate-400 hover:text-white p-1 rounded-lg">
                   <X size={20} />
                 </button>
               </div>
 
+              {/* Batch Add Form */}
+              <form onSubmit={handleAddInventoryBatch} className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-2.5 items-center">
+                <input 
+                  type="text" 
+                  placeholder="שם הפריט (למשל: מחשב נייד מנהלי תיקים / מסך 24 אינץ')" 
+                  value={newBatchItem} 
+                  onChange={e => setNewBatchItem(e.target.value)} 
+                  className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 w-full"
+                />
+                <select 
+                  value={newBatchCategory} 
+                  onChange={e => setNewBatchCategory(e.target.value)} 
+                  className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 w-full md:w-36"
+                >
+                  <option value="מחשב נייד">מחשב נייד</option>
+                  <option value="מסך מחשב">מסך מחשב</option>
+                  <option value="תחנת עגינה">תחנת עגינה</option>
+                  <option value="ציוד היקפי">ציוד היקפי</option>
+                  <option value="סלולר / טאבלט">סלולר / טאבלט</option>
+                </select>
+                <div className="flex gap-2 w-full md:w-auto">
+                  <input 
+                    type="number" 
+                    min="1" 
+                    max="50" 
+                    value={newBatchQty} 
+                    onChange={e => setNewBatchQty(e.target.value)} 
+                    placeholder="כמות" 
+                    title="כמות פריטים להוספה"
+                    className="w-20 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono text-center"
+                  />
+                  <input 
+                    type="text" 
+                    value={newBatchPrefix} 
+                    onChange={e => setNewBatchPrefix(e.target.value)} 
+                    placeholder="קידומת S/N" 
+                    className="w-24 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono"
+                  />
+                  <button type="submit" className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all whitespace-nowrap">
+                    + הוסף למלאי
+                  </button>
+                </div>
+              </form>
+
+              {/* Filter Tabs for Inventory */}
+              <div className="flex gap-2 text-xs font-bold">
+                <button 
+                  onClick={() => setInventoryFilter('all')} 
+                  className={`px-3 py-1.5 rounded-lg ${inventoryFilter === 'all' ? 'bg-slate-800 text-white' : 'text-slate-400 bg-slate-950'}`}
+                >
+                  הכל ({inventoryList.length})
+                </button>
+                <button 
+                  onClick={() => setInventoryFilter('in_stock')} 
+                  className={`px-3 py-1.5 rounded-lg ${inventoryFilter === 'in_stock' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-slate-400 bg-slate-950'}`}
+                >
+                  במלאי פנוי ({inventoryList.filter(i => i.status === 'in_stock').length})
+                </button>
+                <button 
+                  onClick={() => setInventoryFilter('assigned')} 
+                  className={`px-3 py-1.5 rounded-lg ${inventoryFilter === 'assigned' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'text-slate-400 bg-slate-950'}`}
+                >
+                  משויך לעובדים ({inventoryList.filter(i => i.status === 'assigned').length})
+                </button>
+                <button 
+                  onClick={() => setInventoryFilter('returned')} 
+                  className={`px-3 py-1.5 rounded-lg ${inventoryFilter === 'returned' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 bg-slate-950'}`}
+                >
+                  הוחזר / ארכיון ({inventoryList.filter(i => i.status === 'returned').length})
+                </button>
+              </div>
+
+              {/* Table */}
               <div className="flex-1 overflow-y-auto">
-                {allIssuedAssetsList.length === 0 ? (
-                  <p className="text-center text-xs text-slate-500 py-12 font-medium">לא שויך ציוד לאף עובד במערכת</p>
+                {filteredInventory.length === 0 ? (
+                  <p className="text-center text-xs text-slate-500 py-12 font-medium">לא נמצאו פריטי ציוד בקטגוריה זו</p>
                 ) : (
                   <table className="w-full text-right text-xs">
                     <thead>
                       <tr className="border-b border-slate-800 text-slate-400 font-bold">
-                        <th className="py-2.5 px-3">שם העובד/ת</th>
-                        <th className="py-2.5 px-3">מחלקה</th>
-                        <th className="py-2.5 px-3">פריט חומרה</th>
+                        <th className="py-2.5 px-3">שם הפריט</th>
+                        <th className="py-2.5 px-3">קטגוריה</th>
                         <th className="py-2.5 px-3">מספר סידורי (S/N)</th>
-                        <th className="py-2.5 px-3">נופק ע"י</th>
-                        <th className="py-2.5 px-3">תאריך</th>
+                        <th className="py-2.5 px-3">סטטוס</th>
+                        <th className="py-2.5 px-3">משויך אל</th>
+                        <th className="py-2.5 px-3 text-left">פעולות</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60 font-medium text-slate-200">
-                      {allIssuedAssetsList.map((asset, idx) => (
-                        <tr key={idx} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3 px-3 font-bold text-white">{asset.employeeName}</td>
-                          <td className="py-3 px-3 text-slate-400">{asset.employeeDept}</td>
-                          <td className="py-3 px-3 text-cyan-400 font-semibold">{asset.item}</td>
-                          <td className="py-3 px-3 font-mono text-slate-300">{asset.serial}</td>
-                          <td className="py-3 px-3 text-slate-400">{asset.assigned_by}</td>
-                          <td className="py-3 px-3 text-slate-400">{asset.date}</td>
+                      {filteredInventory.map(item => (
+                        <tr key={item.id} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="py-3 px-3 font-bold text-white">{item.item}</td>
+                          <td className="py-3 px-3 text-slate-400">{item.category}</td>
+                          <td className="py-3 px-3 font-mono text-cyan-400">{item.serial}</td>
+                          <td className="py-3 px-3">
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              item.status === 'in_stock' 
+                                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                                : item.status === 'assigned'
+                                ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                                : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                            }`}>
+                              {item.status === 'in_stock' ? 'במלאי פנוי' : item.status === 'assigned' ? 'משויך לעובד/ת' : 'הוחזר'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-slate-300 font-medium">
+                            {item.assigned_to_name || '—'}
+                          </td>
+                          <td className="py-3 px-3 text-left">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {item.status === 'in_stock' && selectedEmployee && (
+                                <button 
+                                  onClick={() => handleAssignInventoryToEmployee(item, selectedEmployee)} 
+                                  className="px-2.5 py-1 bg-cyan-500 hover:bg-cyan-400 text-black text-[11px] font-bold rounded-lg transition-all"
+                                >
+                                  שייך ל-{selectedEmployee.name.split(' ')[0]}
+                                </button>
+                              )}
+                              {item.status === 'assigned' && (
+                                <button 
+                                  onClick={() => handleReturnInventoryItem(item.id)} 
+                                  className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-bold rounded-lg border border-amber-500/30 transition-all"
+                                >
+                                  סמן כהוחזר
+                                </button>
+                              )}
+                              <button onClick={() => handleDeleteInventoryItem(item.id)} className="text-slate-500 hover:text-rose-400 p-1">
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1053,7 +1591,81 @@ export default function App() {
               </div>
 
               <div className="pt-3 border-t border-slate-800 flex justify-end">
-                <button onClick={() => setShowGlobalAssetsModal(false)} className="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition-all">
+                <button onClick={() => setShowInventoryModal(false)} className="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition-all">
+                  סגור
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Admin IT Users Management Modal */}
+        {showAdminModal && (
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-3xl p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <KeyRound size={18} className="text-cyan-400" />
+                  ניהול משתמשי צוות ה-IT
+                </h2>
+                <button onClick={() => setShowAdminModal(false)} className="text-slate-400 hover:text-white">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Add IT User Form */}
+              <form onSubmit={handleAddITUser} className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 space-y-2.5">
+                <span className="text-xs text-slate-300 font-bold block">הוספת איש/אשת צוות IT חדש/ה:</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="שם משתמש (באנגלית)" 
+                    value={newITUser.username} 
+                    onChange={e => setNewITUser({ ...newITUser, username: e.target.value })} 
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono" 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="שם מלא" 
+                    value={newITUser.full_name} 
+                    onChange={e => setNewITUser({ ...newITUser, full_name: e.target.value })} 
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500" 
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="סיסמה" 
+                    value={newITUser.password} 
+                    onChange={e => setNewITUser({ ...newITUser, password: e.target.value })} 
+                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono" 
+                  />
+                </div>
+                <button type="submit" className="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all">
+                  + הוסף משתמש IT
+                </button>
+              </form>
+
+              {/* IT Users List */}
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {itUsersList.map(u => (
+                  <div key={u.id || u.username} className="bg-slate-950/50 border border-slate-800 rounded-xl p-3 flex items-center justify-between text-xs">
+                    <div>
+                      <p className="font-bold text-white">{u.full_name} <span className="font-mono text-cyan-400 font-normal">(@{u.username})</span></p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => handleDeleteITUser(u.id, u.username)} 
+                        className="text-slate-500 hover:text-rose-400 p-1"
+                        title="מחק משתמש IT"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-3 border-t border-slate-800 flex justify-end">
+                <button onClick={() => setShowAdminModal(false)} className="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition-all">
                   סגור
                 </button>
               </div>
