@@ -22,7 +22,7 @@ import {
 // חלק 1: הגדרות ומערכת KALI DASHBOARD
 // ==========================================
 
-const KALI_ACCESS_PASS = "123456"; // סיסמת הכניסה
+const KALI_ACCESS_PASS = "123456";
 
 const ONBOARDING_TASKS = [
   'פתיחת משתמש ב-Active Directory / 365',
@@ -43,7 +43,12 @@ const OFFBOARDING_TASKS = [
 ];
 
 function KaliDashboardView() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('kali_auth') === 'true';
+    }
+    return false;
+  });
   const [inputPass, setInputPass] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -63,12 +68,6 @@ function KaliDashboardView() {
   const [newEmail, setNewEmail] = useState('');
   const [newDept, setNewDept] = useState('');
   const [newType, setNewType] = useState('onboarding');
-
-  useEffect(() => {
-    if (localStorage.getItem('kali_auth') === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -171,7 +170,6 @@ function KaliDashboardView() {
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 font-sans" dir="rtl">
-      {/* סרגל צד */}
       <div className="w-96 border-l border-slate-800 bg-slate-900/50 flex flex-col p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold flex items-center gap-2">
@@ -187,7 +185,6 @@ function KaliDashboardView() {
           </button>
         </div>
 
-        {/* טופס הוספת עובד */}
         <form onSubmit={handleAddUser} className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 mb-4 space-y-2">
           <input
             type="text"
@@ -228,7 +225,6 @@ function KaliDashboardView() {
           </button>
         </form>
 
-        {/* רשימת עובדים */}
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
           {users.map((user) => {
             const isSelected = user.id === selectedUserId;
@@ -275,7 +271,6 @@ function KaliDashboardView() {
         </div>
       </div>
 
-      {/* אזור הצ'ק-ליסט */}
       <div className="flex-1 p-8 overflow-y-auto">
         {selectedUser ? (
           <div className="max-w-2xl mx-auto space-y-6">
@@ -344,7 +339,7 @@ function KaliDashboardView() {
 }
 
 // ==========================================
-// חלק 2: דף הבית המקורי (HOMEPAGE)
+// חלק 2: דף הבית
 // ==========================================
 
 const iconsMap = {
@@ -527,12 +522,17 @@ function HomePageView() {
 // ==========================================
 
 export default function App() {
-  const [isKali, setIsKali] = useState(false);
+  const getIsKali = () => {
+    if (typeof window === 'undefined') return false;
+    const url = window.location.href.toLowerCase();
+    return url.includes('kali');
+  };
+
+  const [isKali, setIsKali] = useState(getIsKali);
 
   useEffect(() => {
     const checkURL = () => {
-      const href = (window.location.href || '').toLowerCase();
-      setIsKali(href.includes('kali'));
+      setIsKali(getIsKali());
     };
 
     checkURL();
