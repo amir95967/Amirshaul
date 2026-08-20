@@ -9,6 +9,9 @@
     <meta name="description" content="אמיר שאול (Amir Shaul) - מומחה IT System Engineer, מהנדס סיסטם ומנהל רשתות ותשתיות ענן." />
     <link rel="canonical" href="https://www.amirshaul.online/" />
 
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
       *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid #e2e8f0; }
       html { line-height: 1.5; -webkit-text-size-adjust: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 16px; scroll-behavior: smooth; }
@@ -57,12 +60,67 @@
       .profile-img-container { position: relative; width: 5.5rem; height: 5.5rem; flex-shrink: 0; }
       .profile-img { width: 100%; height: 100%; object-fit: cover; border-radius: 1rem; border: 2px solid #06b6d4; }
 
-      .btn-cyan { display: block; width: 100%; padding: 0.75rem; background-color: #06b6d4; color: #000; text-align: center; font-weight: 700; border-radius: 0.75rem; text-decoration: none; }
+      .btn-cyan { display: block; width: 100%; padding: 0.75rem; background-color: #06b6d4; color: #000; text-align: center; font-weight: 700; border-radius: 0.75rem; text-decoration: none; border: none; cursor: pointer; }
       .btn-pill-cyan { padding: 0.5rem 1.25rem; border-radius: 9999px; background-color: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.4); color: #22d3ee; font-weight: 700; text-decoration: none; font-size: 0.8rem; }
+
+      /* Kali App Styles */
+      #kali-container { display: none; width: 100vw; min-height: 100vh; position: fixed; inset: 0; z-index: 99999; background: #020617; }
+      #auth-box { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+      .auth-card { width: 100%; max-width: 22rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 1.25rem; padding: 2rem; text-align: center; }
+      .k-input { width: 100%; background: #020617; border: 1px solid #334155; border-radius: 0.75rem; padding: 0.65rem 1rem; color: #fff; font-size: 0.9rem; margin-bottom: 0.75rem; outline: none; }
+      .k-input:focus { border-color: #06b6d4; }
+      #app-box { display: none; width: 100%; height: 100vh; display: flex; }
+      .k-sidebar { width: 22rem; border-left: 1px solid #1e293b; background: rgba(15, 23, 42, 0.8); display: flex; flex-direction: column; padding: 1.25rem; }
+      .k-main { flex: 1; padding: 2rem; overflow-y: auto; }
+      .u-card { padding: 0.85rem; border-radius: 0.75rem; background: #0f172a; border: 1px solid #1e293b; cursor: pointer; margin-bottom: 0.5rem; transition: 0.2s; }
+      .u-card.active { border-color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
+      .t-row { padding: 1rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 0.75rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+      .t-row.done { opacity: 0.5; text-decoration: line-through; }
     </style>
   </head>
   <body>
 
+    <!-- ================= KALI IT SYSTEM ================= -->
+    <div id="kali-container">
+      <div id="auth-box">
+        <div class="auth-card">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔒</div>
+          <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.25rem;">כניסה למערכת IT</h2>
+          <p class="font-mono" style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 1.25rem;">Kali Group Boarding</p>
+          <input type="password" id="kali-pass" class="k-input font-mono" placeholder="הזן סיסמה" />
+          <p id="kali-err" style="color: #f43f5e; font-size: 0.75rem; margin-bottom: 0.75rem; display: none;">סיסמה שגויה</p>
+          <button onclick="doLogin()" class="btn-cyan font-mono">התחבר</button>
+        </div>
+      </div>
+
+      <div id="app-box" style="display:none; height: 100vh;">
+        <div class="k-sidebar">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h1 class="font-mono" style="font-size: 1rem; font-weight: bold; color: #22d3ee;">⚡ IT BOARDING</h1>
+            <button onclick="doLogout()" class="font-mono" style="font-size: 0.75rem; color: #f43f5e; background: none; border: none; cursor: pointer;">יציאה</button>
+          </div>
+
+          <div style="background: #020617; padding: 1rem; border-radius: 0.75rem; border: 1px solid #1e293b; margin-bottom: 1rem;">
+            <input type="text" id="k-name" class="k-input" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" placeholder="שם מלא" />
+            <input type="email" id="k-email" class="k-input" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" placeholder="כתובת מייל" />
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <input type="text" id="k-dept" class="k-input" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; margin-bottom: 0;" placeholder="מחלקה" />
+              <select id="k-type" class="k-input" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; margin-bottom: 0;">
+                <option value="onboarding">קליטה (On)</option>
+                <option value="offboarding">עזיבה (Off)</option>
+              </select>
+            </div>
+            <button onclick="doAddUser()" class="btn-cyan font-mono" style="padding: 0.5rem; font-size: 0.8rem;">+ הוסף עובד ל-Cloud</button>
+          </div>
+
+          <div id="k-users-list" style="flex: 1; overflow-y: auto;"></div>
+        </div>
+
+        <div class="k-main" id="k-details-area"></div>
+      </div>
+    </div>
+
+    <!-- ================= MAIN PORTFOLIO SITE ================= -->
     <div id="scroll-progress"></div>
     <div class="glow-bg"></div>
 
@@ -79,7 +137,6 @@
     </header>
 
     <main class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col" style="gap: 5rem; position:relative; z-index:10;">
-
       <!-- Hero Section -->
       <section class="flex flex-col md:flex-row items-center justify-between gap-10">
         <div style="display:flex; flex-direction:column; gap:1.5rem; text-align:right; max-width:38rem;">
@@ -250,14 +307,223 @@
           יצירת קשר / Contact Form
         </a>
       </section>
-
     </main>
 
     <footer class="w-full text-center py-8 font-mono text-xs" style="color:#64748b; border-top:1px solid #1e293b; margin-top:4rem;">
       © 2026 AMIR SHAUL | IT SYSTEM ENGINEER & INFRASTRUCTURE | ALL SYSTEMS OPERATIONAL
     </footer>
 
+    <!-- ================= SCRIPT ENGINE ================= -->
     <script>
+      // 1. Check Kali Route
+      const ACCESS_PIN = "123456";
+      const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_M2omv18OIuF5ulkLbDhh7g_P1m1OLgU";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      const ON_TASKS = [
+        'פתיחת משתמש ב-Active Directory / 365',
+        'שיוך רישיונות (M365, Teams וכו׳)',
+        'הוספה לקבוצות תפוצה ומחלקות',
+        'הכנת מחשב נייד והתקנת תוכנות',
+        'הגדרת גישת VPN / MFA',
+        'מסירת ציוד ושליחת פרטי התחברות'
+      ];
+
+      const OFF_TASKS = [
+        'חסימת משתמש (Disable Account)',
+        'איפוס סיסמה וניתוק מכל ה-Sessions',
+        'המרת תיבה ל-Shared ושלילת רישיונות',
+        'הסרה מכל קבוצות התפוצה וה-Security',
+        'איסוף מחשב, ציוד היקפי וביטול שיוך ב-MDM',
+        'גיבוי קבצי OneDrive/מחשב מקומי'
+      ];
+
+      let kUsers = [];
+      let kSelectedId = null;
+
+      function checkRouting() {
+        const url = window.location.href.toLowerCase();
+        if (url.includes('kali')) {
+          document.getElementById('kali-container').style.display = 'block';
+          if (localStorage.getItem('kali_auth_valid') === 'true') {
+            showKaliApp();
+          } else {
+            showKaliAuth();
+          }
+        } else {
+          document.getElementById('kali-container').style.display = 'none';
+        }
+      }
+
+      function doLogin() {
+        const pin = document.getElementById('kali-pass').value;
+        if (pin === ACCESS_PIN) {
+          localStorage.setItem('kali_auth_valid', 'true');
+          showKaliApp();
+        } else {
+          document.getElementById('kali-err').style.display = 'block';
+        }
+      }
+
+      function doLogout() {
+        localStorage.removeItem('kali_auth_valid');
+        showKaliAuth();
+      }
+
+      function showKaliAuth() {
+        document.getElementById('auth-box').style.display = 'flex';
+        document.getElementById('app-box').style.display = 'none';
+      }
+
+      async function showKaliApp() {
+        document.getElementById('auth-box').style.display = 'none';
+        document.getElementById('app-box').style.display = 'flex';
+        await fetchKaliUsers();
+      }
+
+      async function fetchKaliUsers() {
+        try {
+          const { data, error } = await supabase.from('employees').select('*').order('created_at', { ascending: false });
+          if (error) throw error;
+          kUsers = (data || []).map(u => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            department: u.department,
+            type: u.type,
+            completed: Array.isArray(u.completed) ? u.completed : []
+          }));
+          if (!kSelectedId && kUsers.length > 0) kSelectedId = kUsers[0].id;
+          renderKUsers();
+          renderKSelected();
+        } catch (e) { console.error(e); }
+      }
+
+      function renderKUsers() {
+        const el = document.getElementById('k-users-list');
+        el.innerHTML = '';
+        if (kUsers.length === 0) {
+          el.innerHTML = '<div style="color:#64748b; font-size:0.75rem; text-align:center; padding:1rem;">אין עובדים ברשימה</div>';
+          return;
+        }
+
+        kUsers.forEach(u => {
+          const isOff = u.type === 'offboarding';
+          const total = isOff ? OFF_TASKS.length : ON_TASKS.length;
+          const prog = Math.round((u.completed.length / total) * 100);
+
+          const div = document.createElement('div');
+          div.className = `u-card ${u.id === kSelectedId ? 'active' : ''}`;
+          div.onclick = () => { kSelectedId = u.id; renderKUsers(); renderKSelected(); };
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:bold; font-size:0.85rem;">${u.name}</span>
+              <div style="display:flex; gap:0.4rem; align-items:center;">
+                <span style="font-size:0.65rem; padding:0.1rem 0.4rem; border-radius:1rem; background:${isOff ? '#f59e0b22' : '#10b98122'}; color:${isOff ? '#f59e0b' : '#10b981'};">
+                  ${isOff ? 'עזיבה' : 'קליטה'}
+                </span>
+                <button onclick="doDeleteUser('${u.id}', event)" style="color:#64748b; background:none; border:none; cursor:pointer; font-size:0.85rem;">🗑️</button>
+              </div>
+            </div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin:0.25rem 0;">${u.department} • ${u.email}</div>
+            <div style="width:100%; height:4px; background:#1e293b; border-radius:2px; overflow:hidden;">
+              <div style="width:${prog}%; height:100%; background:${isOff ? '#f59e0b' : '#06b6d4'};"></div>
+            </div>
+          `;
+          el.appendChild(div);
+        });
+      }
+
+      function renderKSelected() {
+        const area = document.getElementById('k-details-area');
+        const user = kUsers.find(u => u.id === kSelectedId);
+        if (!user) {
+          area.innerHTML = '<div style="color:#64748b; text-align:center; margin-top:5rem;">בחר עובד מהרשימה או הוסף עובד חדש</div>';
+          return;
+        }
+
+        const tasks = user.type === 'offboarding' ? OFF_TASKS : ON_TASKS;
+        let tasksHtml = '';
+        tasks.forEach((t, idx) => {
+          const isDone = user.completed.includes(idx);
+          tasksHtml += `
+            <div class="t-row ${isDone ? 'done' : ''}" onclick="doToggleTask(${idx})">
+              <span style="font-size:0.9rem;">${t}</span>
+              <span>${isDone ? '✅' : '⚪'}</span>
+            </div>
+          `;
+        });
+
+        area.innerHTML = `
+          <div style="max-width:38rem; margin:0 auto;">
+            <div style="background:#0f172a; border:1px solid #1e293b; border-radius:1rem; padding:1.5rem; margin-bottom:1.5rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <h2 style="font-size:1.5rem; font-weight:bold;">${user.name}</h2>
+                  <p style="color:#94a3b8; font-size:0.8rem; margin-top:0.25rem;">${user.email} | מחלקת ${user.department}</p>
+                </div>
+                <span style="font-size:0.75rem; padding:0.25rem 0.75rem; border-radius:1rem; background:${user.type === 'offboarding' ? '#f59e0b22' : '#10b98122'}; color:${user.type === 'offboarding' ? '#f59e0b' : '#10b981'};">
+                  ${user.type === 'offboarding' ? 'תהליך עזיבה' : 'תהליך קליטה'}
+                </span>
+              </div>
+            </div>
+            <h3 class="font-mono" style="font-size:0.85rem; color:#22d3ee; margin-bottom:0.75rem;">צ'ק-ליסט משימות:</h3>
+            ${tasksHtml}
+          </div>
+        `;
+      }
+
+      async function doToggleTask(idx) {
+        const user = kUsers.find(u => u.id === kSelectedId);
+        if (!user) return;
+
+        if (user.completed.includes(idx)) {
+          user.completed = user.completed.filter(i => i !== idx);
+        } else {
+          user.completed.push(idx);
+        }
+
+        renderKUsers();
+        renderKSelected();
+        await supabase.from('employees').update({ completed: user.completed }).eq('id', user.id);
+      }
+
+      async function doAddUser() {
+        const name = document.getElementById('k-name').value;
+        const email = document.getElementById('k-email').value;
+        const dept = document.getElementById('k-dept').value || 'כללי';
+        const type = document.getElementById('k-type').value;
+        if (!name || !email) return;
+
+        const newUser = { id: Date.now().toString(), name, email, department: dept, type, completed: [] };
+        kUsers.unshift(newUser);
+        kSelectedId = newUser.id;
+
+        renderKUsers();
+        renderKSelected();
+
+        document.getElementById('k-name').value = '';
+        document.getElementById('k-email').value = '';
+        document.getElementById('k-dept').value = '';
+
+        await supabase.from('employees').insert([newUser]);
+      }
+
+      async function doDeleteUser(id, e) {
+        e.stopPropagation();
+        kUsers = kUsers.filter(u => u.id !== id);
+        if (kSelectedId === id) kSelectedId = kUsers[0]?.id || null;
+        renderKUsers();
+        renderKSelected();
+        await supabase.from('employees').delete().eq('id', id);
+      }
+
+      window.addEventListener('popstate', checkRouting);
+      window.addEventListener('hashchange', checkRouting);
+      checkRouting();
+
+      // Scroll Bar
       const bar = document.getElementById('scroll-progress');
       window.addEventListener('scroll', () => {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
