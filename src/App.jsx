@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import { 
   Layout, 
   Code2, 
@@ -12,8 +12,35 @@ import {
   Lock,
   Cpu,
   Database,
-  Terminal
+  Terminal,
+  Trash2,
+  CheckCircle2,
+  Circle
 } from 'lucide-react';
+
+const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
+const SUPABASE_KEY = "sb_publishable_M2omv18OIuF5ulkLbDhh7g_P1m1OLgU";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const KALI_PASSWORD = "123456";
+
+const ONBOARDING_TASKS = [
+  'פתיחת משתמש ב-Active Directory / 365',
+  'שיוך רישיונות (M365, Teams וכו׳)',
+  'הוספה לקבוצות תפוצה ומחלקות',
+  'הכנת מחשב נייד והתקנת תוכנות',
+  'הגדרת גישת VPN / MFA',
+  'מסירת ציוד ושליחת פרטי התחברות'
+];
+
+const OFFBOARDING_TASKS = [
+  'חסימת משתמש (Disable Account)',
+  'איפוס סיסמה וניתוק מכל ה-Sessions',
+  'המרת תיבה ל-Shared ושלילת רישיונות',
+  'הסרה מכל קבוצות התפוצה וה-Security',
+  'איסוף מחשב, ציוד היקפי וביטול שיוך ב-MDM',
+  'גיבוי קבצי OneDrive/מחשב מקומי'
+];
 
 const iconsMap = {
   Layout,
@@ -66,10 +93,310 @@ const EXPERIENCE = [
 ];
 
 export default function App() {
+  const [isKaliRoute, setIsKaliRoute] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState(false);
+
+  // Kali Dashboard States
+  const [employees, setEmployees] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newDept, setNewDept] = useState('');
+  const [newType, setNewType] = useState('onboarding');
+
+  useEffect(() => {
+    const checkUrl = () => {
+      const url = window.location.href.toLowerCase();
+      setIsKaliRoute(url.includes('kali'));
+    };
+
+    checkUrl();
+    window.addEventListener('popstate', checkUrl);
+    window.addEventListener('hashchange', checkUrl);
+
+    if (localStorage.getItem('kali_auth_session') === 'true') {
+      setIsAuthenticated(true);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', checkUrl);
+      window.removeEventListener('hashchange', checkUrl);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isKaliRoute && isAuthenticated) {
+      loadEmployees();
+    }
+  }, [isKaliRoute, isAuthenticated]);
+
+  const loadEmployees = async () => {
+    try {
+      const { data, error } = await supabase.from('employees').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      const formatted = (data || []).map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        department: u.department,
+        type: u.type,
+        completed: Array.isArray(u.completed) ? u.completed : []
+      }));
+      setEmployees(formatted);
+      if (!selectedId && formatted.length > 0) {
+        setSelectedId(formatted[0].id);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (passwordInput === KALI_PASSWORD) {
+      setIsAuthenticated(true);
+      setAuthError(false);
+      localStorage.setItem('kali_auth_session', 'true');
+    } else {
+      setAuthError(true);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('kali_auth_session');
+  };
+
+  const handleAddEmployee = async (e) => {
+    e.preventDefault();
+    if (!newName || !newEmail) return;
+
+    const newEmp = {
+      id: Date.now().toString(),
+      name: newName,
+      email: newEmail,
+      department: newDept || 'כללי',
+      type: newType,
+      completed: []
+    };
+
+    setEmployees([newEmp, ...employees]);
+    setSelectedId(newEmp.id);
+    setNewName('');
+    setNewEmail('');
+    setNewDept('');
+
+    await supabase.from('employees').insert([newEmp]);
+  };
+
+  const handleToggleTask = async (taskIndex) => {
+    const currentEmp = employees.find(e => e.id === selectedId);
+    if (!currentEmp) return;
+
+    const isCompleted = currentEmp.completed.includes(taskIndex);
+    const updatedCompleted = isCompleted
+      ? currentEmp.completed.filter(i => i !== taskIndex)
+      : [...currentEmp.completed, taskIndex];
+
+    const updatedEmployees = employees.map(emp => 
+      emp.id === selectedId ? { ...emp, completed: updatedCompleted } : emp
+    );
+
+    setEmployees(updatedEmployees);
+    await supabase.from('employees').update({ completed: updatedCompleted }).eq('id', selectedId);
+  };
+
+  const handleDeleteEmployee = async (id, e) => {
+    e.stopPropagation();
+    const updated = employees.filter(emp => emp.id !== id);
+    setEmployees(updated);
+    if (selectedId === id) {
+      setSelectedId(updated[0]?.id || null);
+    }
+    await supabase.from('employees').delete().eq('id', id);
+  };
+
+  // ================= KALI VIEW =================
+  if (isKaliRoute) {
+    if (!isAuthenticated) {
+      return (
+        <div className="min-h-screen bg-[#020617] text-slate-100 flex items-center justify-center p-4 font-sans" dir="rtl">
+          <form onSubmit={handleLogin} className="w-full max-w-sm bg-slate-900/80 border border-slate-800 rounded-3xl p-8 text-center space-y-6 shadow-2xl backdrop-blur-md">
+            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto text-2xl">
+              <Lock size={28} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white">כניסה למערכת IT</h2>
+              <p className="font-mono text-xs text-slate-400 mt-1">Kali Group Boarding</p>
+            </div>
+            <input 
+              type="password" 
+              value={passwordInput} 
+              onChange={(e) => setPasswordInput(e.target.value)} 
+              placeholder="הזן סיסמה" 
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-cyan-500"
+            />
+            {authError && <p className="text-xs text-rose-500">סיסמה שגויה, נסה שוב</p>}
+            <button type="submit" className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+              התחבר למערכת
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    const selectedEmployee = employees.find(e => e.id === selectedId);
+    const activeTasks = selectedEmployee?.type === 'offboarding' ? OFFBOARDING_TASKS : ONBOARDING_TASKS;
+
+    return (
+      <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col md:flex-row font-sans" dir="rtl">
+        {/* Sidebar */}
+        <div className="w-full md:w-96 border-l border-slate-800 bg-slate-900/60 p-6 flex flex-col shrink-0">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+            <h1 className="font-mono text-base font-bold text-cyan-400 flex items-center gap-2">
+              <Terminal size={18} />
+              IT BOARDING
+            </h1>
+            <button onClick={handleLogout} className="font-mono text-xs text-rose-400 hover:text-rose-300">
+              יציאה
+            </button>
+          </div>
+
+          <form onSubmit={handleAddEmployee} className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-3 mb-6">
+            <input 
+              type="text" 
+              placeholder="שם מלא" 
+              value={newName} 
+              onChange={e => setNewName(e.target.value)} 
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+            />
+            <input 
+              type="email" 
+              placeholder="כתובת מייל" 
+              value={newEmail} 
+              onChange={e => setNewEmail(e.target.value)} 
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+            />
+            <div className="flex gap-2">
+              <input 
+                type="text" 
+                placeholder="מחלקה" 
+                value={newDept} 
+                onChange={e => setNewDept(e.target.value)} 
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+              />
+              <select 
+                value={newType} 
+                onChange={e => setNewType(e.target.value)} 
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+              >
+                <option value="onboarding">קליטה (On)</option>
+                <option value="offboarding">עזיבה (Off)</option>
+              </select>
+            </div>
+            <button type="submit" className="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono text-xs rounded-lg transition-all">
+              + הוסף עובד ל-Cloud
+            </button>
+          </form>
+
+          <div className="flex-1 overflow-y-auto space-y-2">
+            {employees.length === 0 ? (
+              <p className="text-center text-xs text-slate-500 py-6 font-mono">אין עובדים במערכת</p>
+            ) : (
+              employees.map(emp => {
+                const isOff = emp.type === 'offboarding';
+                const total = isOff ? OFFBOARDING_TASKS.length : ONBOARDING_TASKS.length;
+                const prog = Math.round((emp.completed.length / total) * 100);
+                const isSelected = emp.id === selectedId;
+
+                return (
+                  <div 
+                    key={emp.id} 
+                    onClick={() => setSelectedId(emp.id)}
+                    className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'bg-cyan-500/10 border-cyan-500/40 shadow-sm' 
+                        : 'bg-slate-950/40 border-slate-800/60 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-white">{emp.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
+                          isOff ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        }`}>
+                          {isOff ? 'עזיבה' : 'קליטה'}
+                        </span>
+                        <button onClick={(e) => handleDeleteEmployee(emp.id, e)} className="text-slate-500 hover:text-rose-400 p-1">
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-1">{emp.department} • {emp.email}</div>
+                    <div className="w-full h-1 bg-slate-900 rounded-full mt-2 overflow-hidden">
+                      <div className={`h-full ${isOff ? 'bg-amber-400' : 'bg-cyan-400'}`} style={{ width: `${prog}%` }}></div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Details Area */}
+        <div className="flex-1 p-8 overflow-y-auto">
+          {selectedEmployee ? (
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">{selectedEmployee.name}</h2>
+                  <p className="text-xs text-slate-400 font-mono mt-1">{selectedEmployee.email} | מחלקת {selectedEmployee.department}</p>
+                </div>
+                <span className={`text-xs px-3 py-1.5 rounded-full font-mono ${
+                  selectedEmployee.type === 'offboarding' 
+                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' 
+                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                }`}>
+                  {selectedEmployee.type === 'offboarding' ? 'תהליך עזיבה (Offboarding)' : 'תהליך קליטה (Onboarding)'}
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="font-mono text-xs text-cyan-400 font-bold">// צ'ק-ליסט משימות סיסטם:</h3>
+                {activeTasks.map((task, idx) => {
+                  const isDone = selectedEmployee.completed.includes(idx);
+                  return (
+                    <div 
+                      key={idx} 
+                      onClick={() => handleToggleTask(idx)}
+                      className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer select-none ${
+                        isDone 
+                          ? 'bg-slate-950/30 border-slate-800 text-slate-500 line-through' 
+                          : 'bg-slate-900/50 border-slate-800 text-slate-200 hover:border-cyan-500/40'
+                      }`}
+                    >
+                      <span className="text-xs sm:text-sm">{task}</span>
+                      {isDone ? <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> : <Circle size={18} className="text-slate-600 shrink-0" />}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="h-full flex items-center justify-center text-slate-500 text-xs font-mono">
+              בחר עובד מהרשימה או הוסף עובד חדש
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ================= MAIN PORTFOLIO SITE =================
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100 font-sans relative overflow-x-hidden selection:bg-cyan-500 selection:text-black" dir="rtl">
-      
-      {/* Background Glow */}
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_rgba(6,182,212,0.12),transparent_60%)]" />
 
       {/* Header */}
@@ -103,8 +430,6 @@ export default function App() {
 
       {/* Main Content */}
       <main className="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col space-y-24 relative z-10">
-        
-        {/* Hero Section */}
         <section className="flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="space-y-6 text-right max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-400">
@@ -131,7 +456,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Profile Card */}
           <aside className="w-full max-w-sm bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-5 backdrop-blur-sm">
             <div className="flex items-center justify-between font-mono text-xs text-slate-400 pb-3 border-b border-slate-800">
               <div className="flex items-center gap-1.5">
@@ -178,7 +502,6 @@ export default function App() {
           </aside>
         </section>
 
-        {/* Competencies Section */}
         <section className="space-y-6">
           <div className="flex justify-between items-center pb-3 border-b border-slate-800 font-mono text-xs">
             <h2 className="text-cyan-400 font-bold">// CORE IT & SYSTEM COMPETENCIES</h2>
@@ -198,7 +521,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* Experience Section */}
         <section className="space-y-6">
           <div className="flex justify-between items-center pb-3 border-b border-slate-800 font-mono text-xs">
             <h2 className="text-cyan-400 font-bold">// PROFESSIONAL EXPERIENCE</h2>
@@ -220,7 +542,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* Education */}
         <section className="space-y-6">
           <div className="flex justify-between items-center pb-3 border-b border-slate-800 font-mono text-xs">
             <h2 className="text-cyan-400 font-bold">// EDUCATION & QUALIFICATIONS</h2>
@@ -241,7 +562,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* CTA Contact Box */}
         <section className="p-8 md:p-12 bg-gradient-to-r from-slate-900 to-[#020617] border border-cyan-500/30 rounded-3xl flex flex-col items-center text-center space-y-6">
           <h2 className="text-2xl font-black text-white">מעוניינים בחיזוק מערך ה-IT והסיסטם בארגון?</h2>
           <p className="text-slate-300 text-xs sm:text-sm max-w-lg leading-relaxed">
@@ -258,10 +578,8 @@ export default function App() {
             </a>
           </div>
         </section>
-
       </main>
 
-      {/* Footer */}
       <footer className="w-full text-center py-8 text-xs font-mono text-slate-500 border-t border-slate-900">
         © 2026 AMIR SHAUL | ALL SYSTEMS OPERATIONAL
       </footer>
