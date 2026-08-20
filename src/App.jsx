@@ -21,7 +21,9 @@ import {
   Download, 
   Plus, 
   Calendar, 
-  Send 
+  Send,
+  Search,
+  Filter
 } from 'lucide-react';
 
 const SUPABASE_URL = "https://zlfywwidgafrkttixzez.supabase.co";
@@ -142,8 +144,11 @@ export default function App() {
 
   const [employees, setEmployees] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'in_progress', 'completed'
   
   // New Employee Form
+  const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newDept, setNewDept] = useState('');
@@ -260,6 +265,7 @@ export default function App() {
     setNewRole('');
     setNewManager('');
     setNewTargetDate('');
+    setShowAddForm(false);
 
     await db.addEmployee(newEmp);
   };
@@ -370,14 +376,15 @@ export default function App() {
   const handleExportCSV = () => {
     if (employees.length === 0) return;
     let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-    csvContent += "שם מלא,אימייל,מחלקה,תפקיד,מנהל,סטטוס,התקדמות %,תאריך יעד\n";
+    csvContent += "שם מלא,אימייל,מחלקה,תפקיד,מנהל,סוג תהליך,סטטוס ביצוע,התקדמות %,תאריך יעד\n";
 
     employees.forEach(e => {
       const isOff = e.type === 'offboarding';
       const total = isOff ? OFFBOARDING_TASKS.length : ONBOARDING_TASKS.length;
       const count = Object.keys(e.completed || {}).length;
       const prog = Math.round((count / total) * 100);
-      csvContent += `"${e.name}","${e.email}","${e.department}","${e.role}","${e.manager}","${isOff ? 'עזיבה' : 'קליטה'}","${prog}%","${e.target_date}"\n`;
+      const statusText = prog === 100 ? 'הושלם' : 'בתהליך';
+      csvContent += `"${e.name}","${e.email}","${e.department}","${e.role}","${e.manager}","${isOff ? 'עזיבה' : 'קליטה'}","${statusText}","${prog}%","${e.target_date}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);
@@ -388,6 +395,24 @@ export default function App() {
     link.click();
     document.body.removeChild(link);
   };
+
+  // Filtered employees list
+  const filteredEmployees = employees.filter(emp => {
+    const matchesSearch = 
+      emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.role.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const isOff = emp.type === 'offboarding';
+    const total = isOff ? OFFBOARDING_TASKS.length : ONBOARDING_TASKS.length;
+    const count = Object.keys(emp.completed || {}).length;
+    const isCompleted = count === total && total > 0;
+
+    if (statusFilter === 'in_progress') return matchesSearch && !isCompleted;
+    if (statusFilter === 'completed') return matchesSearch && isCompleted;
+    return matchesSearch;
+  });
 
   // ================= KALI VIEW =================
   if (isKaliRoute) {
@@ -431,13 +456,15 @@ export default function App() {
 
     const selectedEmployee = employees.find(e => e.id === selectedId);
     const activeTasks = selectedEmployee?.type === 'offboarding' ? OFFBOARDING_TASKS : ONBOARDING_TASKS;
+    const selectedCompletedCount = Object.keys(selectedEmployee?.completed || {}).length;
+    const isSelectedFullyDone = selectedCompletedCount === activeTasks.length && activeTasks.length > 0;
 
     return (
       <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col md:flex-row" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Rubik, Arial, sans-serif' }} dir="rtl">
         
         {/* Sidebar */}
         <div className="w-full md:w-96 border-l border-slate-800 bg-slate-900/70 p-5 flex flex-col shrink-0">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
             <div>
               <h1 className="text-base font-bold text-cyan-400 flex items-center gap-2">
                 <Terminal size={18} />
@@ -458,80 +485,128 @@ export default function App() {
             </div>
           </div>
 
-          {/* Form Create */}
-          <form onSubmit={handleAddEmployee} className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 space-y-2.5 mb-5">
-            <div className="flex justify-between items-center text-xs font-bold text-slate-300">
-              <span>הוספת עובד/ת חדש/ה</span>
-              <span className="text-cyan-400 text-[11px]">סנכרון ענן פעיל</span>
+          {/* Quick Action Button & Filters */}
+          <div className="space-y-3 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search size={14} className="absolute right-3 top-3 text-slate-500" />
+                <input 
+                  type="text" 
+                  placeholder="חיפוש עובד/ת לפי שם או מחלקה..." 
+                  value={searchQuery} 
+                  onChange={e => setSearchQuery(e.target.value)} 
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pr-9 pl-3 py-2 text-xs text-white outline-none focus:border-cyan-500 transition-colors"
+                />
+              </div>
+              <button 
+                onClick={() => setShowAddForm(!showAddForm)} 
+                className="p-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all shadow-md shrink-0 flex items-center gap-1"
+              >
+                <Plus size={16} />
+                <span>{showAddForm ? 'סגור' : 'חדש'}</span>
+              </button>
             </div>
-            <input 
-              type="text" 
-              placeholder="שם מלא" 
-              value={newName} 
-              onChange={e => setNewName(e.target.value)} 
-              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
-            />
-            <input 
-              type="email" 
-              placeholder="כתובת מייל ארגונית" 
-              value={newEmail} 
-              onChange={e => setNewEmail(e.target.value)} 
-              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <input 
-                type="text" 
-                placeholder="מחלקה" 
-                value={newDept} 
-                onChange={e => setNewDept(e.target.value)} 
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
-              />
-              <input 
-                type="text" 
-                placeholder="תפקיד" 
-                value={newRole} 
-                onChange={e => setNewRole(e.target.value)} 
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <input 
-                type="text" 
-                placeholder="מנהל ישיר" 
-                value={newManager} 
-                onChange={e => setNewManager(e.target.value)} 
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
-              />
-              <input 
-                type="date" 
-                value={newTargetDate} 
-                onChange={e => setNewTargetDate(e.target.value)} 
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-cyan-500"
-              />
-            </div>
-            <select 
-              value={newType} 
-              onChange={e => setNewType(e.target.value)} 
-              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-medium"
-            >
-              <option value="onboarding">🚀 תהליך קליטה (Onboarding)</option>
-              <option value="offboarding">🛑 תהליך עזיבה (Offboarding)</option>
-            </select>
-            <button type="submit" className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-lg transition-all shadow-md">
-              + הוסף עובד למערכת
-            </button>
-          </form>
 
-          {/* List */}
+            {/* Filter Tabs */}
+            <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
+              <button 
+                onClick={() => setStatusFilter('all')} 
+                className={`flex-1 py-1 rounded-lg transition-all ${statusFilter === 'all' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+              >
+                הכל ({employees.length})
+              </button>
+              <button 
+                onClick={() => setStatusFilter('in_progress')} 
+                className={`flex-1 py-1 rounded-lg transition-all ${statusFilter === 'in_progress' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:text-white'}`}
+              >
+                בתהליך
+              </button>
+              <button 
+                onClick={() => setStatusFilter('completed')} 
+                className={`flex-1 py-1 rounded-lg transition-all ${statusFilter === 'completed' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-slate-400 hover:text-white'}`}
+              >
+                הושלמו
+              </button>
+            </div>
+          </div>
+
+          {/* Form Create Modal/Expandable */}
+          {showAddForm && (
+            <form onSubmit={handleAddEmployee} className="bg-slate-950/90 border border-cyan-500/30 rounded-2xl p-4 space-y-2.5 mb-4 shadow-lg">
+              <div className="flex justify-between items-center text-xs font-bold text-slate-300 pb-1 border-b border-slate-800">
+                <span>טופס הוספת עובד/ת חדש/ה</span>
+                <span className="text-cyan-400 text-[11px]">סנכרון ענן</span>
+              </div>
+              <input 
+                type="text" 
+                placeholder="שם מלא" 
+                value={newName} 
+                onChange={e => setNewName(e.target.value)} 
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+              />
+              <input 
+                type="email" 
+                placeholder="כתובת מייל ארגונית" 
+                value={newEmail} 
+                onChange={e => setNewEmail(e.target.value)} 
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input 
+                  type="text" 
+                  placeholder="מחלקה" 
+                  value={newDept} 
+                  onChange={e => setNewDept(e.target.value)} 
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+                />
+                <input 
+                  type="text" 
+                  placeholder="תפקיד" 
+                  value={newRole} 
+                  onChange={e => setNewRole(e.target.value)} 
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input 
+                  type="text" 
+                  placeholder="מנהל ישיר" 
+                  value={newManager} 
+                  onChange={e => setNewManager(e.target.value)} 
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500"
+                />
+                <input 
+                  type="date" 
+                  value={newTargetDate} 
+                  onChange={e => setNewTargetDate(e.target.value)} 
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 outline-none focus:border-cyan-500"
+                />
+              </div>
+              <select 
+                value={newType} 
+                onChange={e => setNewType(e.target.value)} 
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-medium"
+              >
+                <option value="onboarding">🚀 תהליך קליטה (Onboarding)</option>
+                <option value="offboarding">🛑 תהליך עזיבה (Offboarding)</option>
+              </select>
+              <button type="submit" className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-lg transition-all shadow-md">
+                + שמור עובד למערכת
+              </button>
+            </form>
+          )}
+
+          {/* Employees List */}
           <div className="flex-1 overflow-y-auto space-y-2">
-            {employees.length === 0 ? (
-              <p className="text-center text-xs text-slate-500 py-6 font-medium">אין עובדים במערכת</p>
+            {filteredEmployees.length === 0 ? (
+              <p className="text-center text-xs text-slate-500 py-8 font-medium">לא נמצאו עובדים התואמים לחיפוש</p>
             ) : (
-              employees.map(emp => {
+              filteredEmployees.map(emp => {
                 const isOff = emp.type === 'offboarding';
                 const total = isOff ? OFFBOARDING_TASKS.length : ONBOARDING_TASKS.length;
                 const completedCount = Object.keys(emp.completed || {}).length;
                 const prog = Math.round((completedCount / total) * 100);
+                const isDone = completedCount === total && total > 0;
                 const isSelected = emp.id === selectedId;
 
                 return (
@@ -547,11 +622,17 @@ export default function App() {
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-white">{emp.name}</span>
                       <div className="flex items-center gap-1.5">
-                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                          isOff ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                        }`}>
-                          {isOff ? 'עזיבה' : 'קליטה'}
-                        </span>
+                        {isDone ? (
+                          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                            ✅ הושלם
+                          </span>
+                        ) : (
+                          <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                            isOff ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                          }`}>
+                            {isOff ? 'עזיבה פתוחה' : 'קליטה פתוחה'}
+                          </span>
+                        )}
                         <button onClick={(e) => handleDeleteEmployee(emp.id, e)} className="text-slate-500 hover:text-rose-400 p-1">
                           <Trash2 size={14} />
                         </button>
@@ -565,7 +646,7 @@ export default function App() {
                       </div>
                     )}
                     <div className="w-full h-1.5 bg-slate-900 rounded-full mt-2.5 overflow-hidden">
-                      <div className={`h-full ${isOff ? 'bg-amber-400' : 'bg-cyan-400'}`} style={{ width: `${prog}%` }}></div>
+                      <div className={`h-full ${isDone ? 'bg-emerald-400' : isOff ? 'bg-amber-400' : 'bg-cyan-400'}`} style={{ width: `${prog}%` }}></div>
                     </div>
                   </div>
                 );
@@ -584,13 +665,19 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-bold text-white">{selectedEmployee.name}</h2>
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                      selectedEmployee.type === 'offboarding' 
-                        ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' 
-                        : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                    }`}>
-                      {selectedEmployee.type === 'offboarding' ? 'תהליך עזיבה (Offboarding)' : 'תהליך קליטה (Onboarding)'}
-                    </span>
+                    {isSelectedFullyDone ? (
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                        ✅ תהליך הושלם במלואו (100%)
+                      </span>
+                    ) : (
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                        selectedEmployee.type === 'offboarding' 
+                          ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' 
+                          : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                      }`}>
+                        {selectedEmployee.type === 'offboarding' ? '🛑 תהליך עזיבה בתהליך' : '🚀 תהליך קליטה בתהליך'}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-slate-400 mt-1.5 font-medium leading-relaxed">
                     {selectedEmployee.email} | מחלקה: {selectedEmployee.department} | תפקיד: {selectedEmployee.role}
@@ -605,7 +692,7 @@ export default function App() {
                   onClick={() => setActiveTab('tasks')}
                   className={`px-4 py-2 rounded-xl transition-all ${activeTab === 'tasks' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800'}`}
                 >
-                  📋 צ'ק-ליסט סיסטם ({Object.keys(selectedEmployee.completed || {}).length}/{activeTasks.length})
+                  📋 צ'ק-ליסט סיסטם ({selectedCompletedCount}/{activeTasks.length})
                 </button>
                 <button 
                   onClick={() => setActiveTab('assets')}
@@ -836,7 +923,7 @@ export default function App() {
               <p><span className="text-slate-400">Location:</span> Holon / Tel Aviv</p>
             </div>
 
-            <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" className="block w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black text-center font-bold text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+            <a href="https://form.amirshaul.online" target="_blank" rel="noreferrer" className="block w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               SEND MESSAGE // צור קשר
             </a>
           </aside>
